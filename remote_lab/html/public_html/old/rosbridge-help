@@ -1,0 +1,65 @@
+sudo apt-cache search ssh (procurar pacotes)
+
+sudo apt-get install openssh-server (servidor de ssh, n vem no desktop edition)
+
+sudo apt-get purge openssh-server (para desistalar um pacote)
+
+
+sudo apt-get install ros-indigo-rosbridge-suite
+
+
+seguir o gia para instar o ros e o de instalar o workspace
+
+clonar o repositorio para dentro da directoria ~/catkin_ws/src
+
+git clone https://tarquinio_mota@bitbucket.org/artica/magabot-ros.git
+
+ir para ~/catkin_ws/ e fazer catkin_make
+
+se faltarem dependencias procurar: (teleop é a que falta)
+sudo apt-cache search teleop
+
+sudo apt-get install 
+
+instalar cenas de arduino:
+http://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup
+
+instalar dos binários (3.1) e não da source (3.2)
+
+
+
+voltar a fazer catkin_make
+
+      <li><tt>roscore</tt></li>
+      <li><tt>rostopic pub /listener std_msgs/String "Hello, World"</tt></li>
+      <li><tt>rostopic echo /cmd_vel</tt></li>
+      <li><tt>rosrun rospy_tutorials add_two_ints_server</tt></li>
+      <li><tt>roslaunch rosbridge_server rosbridge_websocket.launch</tt></li>
+
+
+para ver os tópicos que existem
+rostopic list
+
+
+para gravar/correr simulações:
+http://wiki.ros.org/ROS/Tutorials/Recording%20and%20playing%20back%20data
+
+para correr o rosbridge:
+roslaunch rosbridge_server rosbridge_websocket.launch
+
+
+para ver os dados publicados num topico especifico:
+rostopic echo /teleop
+
+
+para por o magabot real a correr (a partia da directoria que tem o magabot.launch)
+roslaunch magabot magabot.launch
+
+
+para testar com o bag file
+rosbag play -s 60 -r 0.1 ~/catkin_ws/src/magabot-ros/magabot/bags/magabot_17102014.bag
+
+
+rqt_graph - mostra um grafo dos topicos activos, publishers, etc
+
+

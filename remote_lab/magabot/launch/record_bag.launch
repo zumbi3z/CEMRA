@@ -1,0 +1,3 @@
+<launch>
+	<node pkg="magabot" type="record_bag.py" name="bag_recording" output="screen"/>
+</launch>

@@ -1,0 +1,14 @@
+<launch>
+
+  <!-- Rosserial for motors -->
+  <node name="magabot_comm" pkg="rosserial_python" type="serial_node.py" args="_port:=/dev/ttyACM0 _baud:=115200" respawn="true" />
+  
+  <node name="controller" pkg="magabot" type="magabot_node"/>
+   
+  <!--node name="base_tf_broadcaster" pkg="tf" type="static_transform_publisher" args="0. 0 0.050825 0 0 0 1 base_footprint base_link 100" /-->
+  
+  <!--include file="$(find magabot)/launch/gmapping.launch"/-->
+  
+  <!--include file="$(find magabot)/launch/hector_mapping.launch"/-->
+  
+</launch>

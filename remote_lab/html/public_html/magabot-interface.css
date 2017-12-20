@@ -1,0 +1,83 @@
+
+body { margin: 0px; overflow:hidden;}
+
+h1 { font-family: 'Arial', 'Arial', Arial, sans-serif;
+    font-weight: 600; font-size: 2vw; margin-left: 5%; -webkit-margin-after: 0px;
+    display: inline-block; margin-top: 1vw; vertical-align: middle
+;}
+
+.section_header {cursor: pointer}
+
+
+.clearfix:after {
+   content: " "; /* Older browser do not support empty content */
+   visibility: hidden;
+   display: block;
+   height: 0;
+   clear: both;
+}
+
+#div_container {margin: 0px; overflow: hidden;}
+
+#div_log { width: 35vw; height:100vh; float: left;}
+#div_control { width: 35vw; height:100vh; float: left;}
+#div_feedback { width: 30vw; height:100vh; float: left; background-color: #EEEEEE; overflow-y: auto; overflow-x: hidden;}
+
+
+#status_log { width: 90%; margin-left:5%; margin-top:0%; margin-bottom: 5%; resize: none; border:1px solid black; overflow: auto;}
+#img_clear_log {width: 10vw; height:2vw; font-size: 1.5vw; margin-left:5%;}
+
+#text_server_address { width: 40%; margin-left:5%; margin-top:0%; }
+#button_connect { width: 25%; ; margin-top:0%; }
+
+.div_video { width: 90%; height:0px; margin-left: 5%; background-color: #DDDDDD}
+#test_canvas { width: 100%; height:100%; background-color: #DDDDDD; border:1px}
+#test_canvas2 { width: 100%; height:100%; background-color: #DDDDDD; border:1px}
+/*#test_canvas2 { width: 100%; height:100%; background-color: #DDDDDD; border:1px}*/
+
+
+.div_header_content {}
+
+label {font-size: 2vw}
+
+/* Different configurations for the messages in the log window*/
+.message_ui{color:blue;}
+.message_normal{color:black;}
+.message_error{color:red;}
+.message_warning{color:yellow;}
+
+/* Image to toggle the visibility on the sidebar divs*/
+.toggle_image {width:2.4vw; height:2.4vw; margin-top: 1vw; vertical-align: middle; margin-bottom: 0.5vw}
+
+.topic_button {width: 14vw; height:4vw; font-size: 1.5vw;}
+
+
+#button_file {margin-bottom: 0.5vw}
+
+.div_bumper { width: 40%; height:5vh; border: 0.5vh solid #888888; background-color: #888888; }
+#div_bumper_left { border-radius: 1.2vh 0 0 1.2vh; margin-left:5%; display:inline-block;}
+#div_bumper_right { border-radius: 0 1.2vh 1.2vh 0; margin-right:5%;  display:inline-block;}
+
+#div_control_buttons { position:relative; width: 90%; height:0px; margin-left: 5%; }
+
+.button_dir {width: 4.5vw; height:4.5vw;}
+#button_stop {width: 6vw; height:6vw;}
+.button_adjust {width: 4vw; height:4vw;}
+
+#div_heading {display: flex; flex-orientation:row;}
+
+#table_heading { max-width:100%; font-family: 'Arial', 'Arial', Arial, sans-serif; flex:0.6;
+    font-weight: 100; font-size: 1vw; border-radius: 0.8vh; border: 2px solid #888888; margin-left:5%; border-spacing: 0px;}
+
+
+#table_heading td,th{ width: 3.5vw; height: 3vw; border: 2px solid #888888; border-spacing: 0px;}
+#canvas_heading { width: 10vw; flex:0.35; border-radius: 0.8vh; background-color: #888888;}
+
+
+#canvas_map {width:28vw; height:28vw; margin-left: 1vw; background-color: #EEEEEE; }
+
+.canvas_ir_sensor {width: 90%; height:3vh; border-radius: 0.8vh; border:0.4vh solid #888888; margin-left:5%;}
+
+#canvas_sonars { width: 90%; height:50%; background-color: #DDDDDD; margin-left:5%;}
+
+#canvas_laser {width:28vw; height:28vw; margin-left: 1vw; background-color: #EEEEEE; }

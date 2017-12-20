@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="magabot-interface.css">
+<script src="js/jquery-2.0.3.min.js"></script>
+<script src="js/eventemitter2.min.js"></script>
+<script src="js/roslib.js"></script>
+<script src="js/utils.js"></script>
+<script src="magabot-interface.js"></script>
+<script src="ros-connection.js"></script>
+<script src="init.js"></script>
+
+</head>
+<body>
+    <div id='div_container'>
+
+        <div id='div_log'>
+            <h1>Cemra Dome view</h1>
+            <div id='div_video_1' class='div_video'>
+            <canvas id='test_canvas'></canvas>
+            </div>
+            <!--
+            <h1>Address</h1>
+            <input type='text' id='text_server_address' value='ws://sscpc0.ist.utl.pt:9090' ></input>
+            <input type='button' id='button_connect' value='Connect'></input>
+            -->
+            <h1>System log</h1><br>
+            <input type='button' id='img_clear_log' value='Clear Log'></input>
+            <div id="status_log"></div>
+        </div>
+
+        <div id='div_control'>
+            <h1>Cemra PTZ view</h1>
+            <div id='div_video_2' class='div_video'>
+            <canvas id='test_canvas2'></canvas>
+	    </div>
+            <div id='div_control_buttons'></div>
+        </div>
+        
+        <div id='div_feedback'>
+            <img id='img_toggle_topics' class='toggle_image' src="img/btn_expand.svg"> </img>
+            <h1 id='header_topics' class='section_header'>Rosbag Record</h1><br>
+            <div id='div_topics' class='div_header_content' style="display: none"></div>
+
+            <img id='img_toggle_code_upload' class='toggle_image' src="img/btn_expand.svg"> </img>
+            <h1 id='header_code_upload' class='section_header'>Code Upload</h1><br>
+            <div id='div_code_upload' class='div_header_content' style="display: none">
+		 <!--form action="?action=upload" enctype="multipart/form-data" method="post"-->
+		 <form action="upload_zip.php" enctype="multipart/form-data" method="post">
+		    <input type='file' id='button_file' value='File' name='zip_file'></input><br>
+		    <input type="submit" name="submit" value="Upload" />
+                </form>
+                <input type='button' id='button_start_code' class='topic_button' value='Start Execution'></input>
+                <input type='button' id='button_stop_code' class='topic_button' value='Stop Execution'></input>
+            </div>
+
+            <img id='img_toggle_bumpers' class='toggle_image' src="img/btn_expand.svg"> </img>
+            <h1 id='header_bumpers' class='section_header'>Bumpers</h1><br>
+            <div id='div_bumpers' style="display: none">
+                <div id='div_bumper_left' class='div_bumper'></div>
+                <div id='div_bumper_right' class='div_bumper'></div>
+            </div>
+
+            <img id='img_toggle_map' class='toggle_image' src="img/btn_expand.svg"> </img>
+            <h1 id='header_map' class='section_header'>Map</h1><br>
+            <div id='div_map' style="display: none">
+                <canvas id='canvas_map'></canvas>
+            </div>
+
+            <img id='img_toggle_heading' class='toggle_image' src="img/btn_expand.svg"> </img>
+            <h1 id='header_heading' class='section_header'>Heading</h1><br>
+            <div id='div_heading' class='div_header_content' style="display: none">
+                <table>
+                    <tr>
+                        <td>
+                            <table id='table_heading' >
+                                <tr><th></th><th>X</th><th>Z</th><th>Y</th></tr>
+                                <tr>
+                                    <td>Linear Velocity</td>
+                                    <td id='td_linear_velocity_X'></td>
+                                    <td id='td_linear_velocity_Z'></td>
+                                    <td id='td_linear_velocity_Y'></td>
+                                </tr>
+                                <tr>
+                                    <td>Angular Velocity</td>
+                                    <td id='td_angular_velocity_X'></td>
+                                    <td id='td_angular_velocity_Z'></td>
+                                    <td id='td_angular_velocity_Y'></td>
+                                </tr>
+                                <tr>
+                                    <td>Position</td>
+                                    <td id='td_position_X'></td>
+                                    <td id='td_position_Z'></td>
+                                    <td id='td_position_Y'></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                           <canvas id='canvas_heading' width='500' height='500'></canvas>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <img id='img_toggle_ir_sensors' class='toggle_image' src="img/btn_expand.svg"> </img>
+            <h1 id='header_ir_sensors' class='section_header'>IR Sensors</h1><br>
+            <div id='div_ir_sensors' style="display: none">
+                <canvas id='canvas_ir_sensor_0' class='canvas_ir_sensor'></canvas>
+                <canvas id='canvas_ir_sensor_1' class='canvas_ir_sensor'></canvas>
+                <canvas id='canvas_ir_sensor_2' class='canvas_ir_sensor'></canvas>
+            </div>
+
+            <img id='img_toggle_sonars' class='toggle_image' src="img/btn_expand.svg"> </img>
+            <h1 id='header_sonars' class='section_header'>Sonars</h1><br>
+            <div id='div_sonars' style="display: none">
+                <canvas id='canvas_sonars'></canvas>
+            </div>
+            
+            <img id='img_toggle_laser' class='toggle_image' src="img/btn_expand.svg"> </img>
+            <h1 id='header_map' class='section_header'>Laser Readings</h1><br>
+            <div id='div_laser' style="display: none">
+                <canvas id='canvas_laser'></canvas>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

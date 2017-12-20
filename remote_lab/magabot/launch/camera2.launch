@@ -1,0 +1,22 @@
+<launch>
+  <arg name="camera_name" default="axis" />
+  <arg name="hostname" default="192.168.1.90" />
+  <arg name="enable_theora" default="0" />
+  <arg name="enable_ptz" default="0" />
+  <arg name="enable_ptz_teleop" default="0" />
+
+  <group ns="$(arg camera_name)">
+    <param name="hostname" value="$(arg hostname)" />
+    <param name="width" value="216" />
+    <param name="height" value="384" />
+    <node pkg="axis_camera" type="axis.py" name="axis2"/>
+    
+    <node pkg="image_transport" type="republish" name="republish2" args="compressed in:=image_raw raw out:=image_raw2"/>
+  </group>
+
+  <node pkg="web_video_server" type="web_video_server" name="web_server2">
+  	<param name="port" value="10001"/>
+	<param name="address" value="127.0.0.1"/>
+  </node>    
+   
+</launch>

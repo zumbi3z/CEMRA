@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+	<arg name="ip"/>
+	<arg name="stream_num"/>
+	<arg name="ip_is_91" default='0'/>
+	<arg name="ip_is_92" default='0'/>
+
+	<node if="$(arg ip_is_91)" name="republisher_$(arg ip)_$(arg stream_num)" pkg="image_transport" type="republish" args="compressed in:=/camera_driver_$(arg ip)_$(arg stream_num)/stream out:=/camera_driver_$(arg ip)_$(arg stream_num)/image" required="true"/>
+	<node if="$(arg ip_is_91)" name="streamer_$(arg ip)_$(arg stream_num)" pkg="scout_ipcam" type="streamer1" args="http://192.168.1.$(arg ip)/video$(arg stream_num).mjpg" output='screen'/>
+	
+	<node if="$(arg ip_is_92)" name="republisher_$(arg ip)_$(arg stream_num)" pkg="image_transport" type="republish" args="compressed in:=/camera_driver_$(arg ip)_$(arg stream_num)/stream out:=/camera_driver_$(arg ip)_$(arg stream_num)/image" required="true"/>
+        <node if="$(arg ip_is_92)" name="streamer_$(arg ip)_$(arg stream_num)" pkg="scout_ipcam" type="streamer" args="http://192.168.1.$(arg ip)/cgi-bin/video$(arg stream_num).jpg?size=3" output='screen'/>
+
+
+    <!-- node pkg="image_view" required="true" name="driver_image_view_$(arg ip)_$(arg stream_num)" type="image_view">
+      <param name="autosize" value="true" />   
+      <remap from="image" to="/camera_driver_$(arg ip)_$(arg stream_num)/image"/>
+    </node -->
+
+
+</launch>

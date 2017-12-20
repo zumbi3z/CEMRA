@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+
+	<include file="$(find scout_ipcam)/launch/streamer_v2.launch">
+		<arg name="ip" value="92"/>
+		<arg name="stream_num" value="1"/>
+		<arg name="ip_is_92" value="1"/>
+	</include>
+
+	<!--node pkg="web_video_server" type="web_video_server" name="web_server2">
+          <param name="server_threads" value="100"/>
+          <param name="ros_threads" value="100"/>
+	  <param name="port" value="10001"/>
+	  <param name="address" value="127.0.0.1"/>
+        </node-->
+
+
+</launch>

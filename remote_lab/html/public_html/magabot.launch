@@ -1,0 +1,28 @@
+<launch>
+
+  <!-- Rosserial for motors -->
+  <node name="magabot_comm" pkg="rosserial_python" type="serial_node.py" args="_port:=/dev/ttyACM0 _baud:=115200" respawn="true" />
+  
+  <!-- MOTOR ODOMETRY -->
+  <node name="Odometry" pkg="magabot" type="Odometry" />
+  
+  <!-- MOTOR CONTROL -->
+  <node name="Controller" pkg="magabot" type="Controller"/>
+
+  <node name="base_tf_broadcaster" pkg="tf" type="static_transform_publisher" args="0 0 0.050825 0 0 0 1 base_footprint base_link 100" />
+
+<!--
+  <param name="/usb_cam/pixel_format" value="yuyv"/>
+  
+  <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/video0" />
+    <param name="image_width" value="320" />
+    <param name="image_height" value="240" />
+    <param name="camera_frame_id" value="usb_cam" />
+    <param name="usb_cam/pixel_format" value="yuyv" />
+    <param name="io_method" value="mmap"/>
+    <param name="framerate" value="10"/>
+  </node>
+-->
+  
+</launch>

@@ -1,0 +1,4 @@
+AuthType Basic
+AuthName "Restricted access for USORA members"
+AuthUserFile /home/isrusora/html/passwd/passwords
+Require user usora

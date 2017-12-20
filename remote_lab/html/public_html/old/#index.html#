@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css" href="magabot-interface.css">
+<script src="js/jquery-2.0.3.min.js"></script>
+<script src="js/eventemitter2.min.js"></script>
+<script src="js/roslib.js"></script>
+<script src="js/three.min.js"></script>
+
+<script type="text/javascript">
+  function getIP(json) {
+  ip = json.ip;
+  }
+</script>
+<script type="application/javascript" src="http://api.ipify.org?format=jsonp&callback=getIP"></script>
+
+<script src="magabot-interface.js"></script>
+<script type="text/javascript" src="ros-connection.js"></script>
+<script src="init.js"></script>
+<script type="text/javascript" src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+<script type="text/javascript" src="http://cdn.robotwebtools.org/mjpegcanvasjs/current/mjpegcanvas.min.js"></script>
+</head>
+
+<body>
+    <div id='div_container'>
+        <div id='div_log'>
+            <h1>Magabot view 1</h1>
+            <div id='div_video_1' class='div_video'>
+          	    <canvas id='test_canvas2'></canvas>		    
+	    </div>	
+            <div id='div_control_buttons'></div>
+        </div>
+
+        <div id='div_feedback'>
+
+            <h1>Bumpers</h1>
+            <div id='div_bumper_left' class='div_bumper'></div>
+            <div id='div_bumper_right' class='div_bumper'></div>
+
+            <h1>Heading</h1>
+            <div id='div_heading'>
+                <table id='table_heading' >
+                    <tr><th></th><th>X</th><th>Y</th><th>&theta;</th></tr>
+                    <tr>
+                        <td>Linear Velocity</td>
+                        <td id='td_linear_velocity_X'></td>
+                        <td id='td_linear_velocity_Y'></td>
+                        <td id='td_linear_velocity_THETA'></td>
+                    </tr>
+                    <tr>
+                        <td>Angular Velocity</td>
+                        <td id='td_angular_velocity_X'></td>
+                        <td id='td_angular_velocity_Y'></td>
+                        <td id='td_angular_velocity_THETA'></td>
+                    </tr>
+                    <tr>
+                        <td>Position</td>
+                        <td id='td_position_X'></td>
+                        <td id='td_position_Y'></td>
+                        <td id='td_position_THETA'></td>
+                    </tr>
+                </table>
+                <!--canvas id='canvas_heading'></canvas-->
+
+            </div>
+
+            <h1>IR Sensors</h1>
+            <canvas id='canvas_ir_sensor_0' class='canvas_ir_sensor'></canvas>
+            <canvas id='canvas_ir_sensor_1' class='canvas_ir_sensor'></canvas>
+            <canvas id='canvas_ir_sensor_2' class='canvas_ir_sensor'></canvas>
+
+            <h1>Sonars</h1>
+            <canvas id='canvas_sonars'></canvas>
+        </div>
+    </div>
+</body>
+</html>

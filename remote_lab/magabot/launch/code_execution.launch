@@ -1,0 +1,3 @@
+<launch>
+	<node pkg="magabot" type="code_execution.py" name="execute_code" output="screen"/>
+</launch>

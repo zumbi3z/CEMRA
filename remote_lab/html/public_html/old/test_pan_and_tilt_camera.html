@@ -1,0 +1,28 @@
+<html>
+<head></head>
+<body>
+	<p align=left>
+		<font size="7" face="Comic Sans MS" color="#FF0000">
+		Network Camera Demo
+		</font>
+	</p>
+	<p align=left>
+		<!-- Begin of scripts to auto refresh the image. Change the IP address in the image
+		URL and refreshrate if necessary. //-->
+		<script language=javascript>
+			var image="192.168.1.92/cgi-bin/video.jpg";
+			var imgwidth = 352;
+			var imgheight = 240;
+			function refresh(){
+				document.images["pic"].src=image+"?"+new Date();
+				setTimeout('refresh()', 100);
+			}
+			document.write('<img src="'+image+'" height="'+imgheight+'"
+			width="'+imgwidth+'" name="pic">');
+			if(document.images) window.onload=refresh;
+		</script>
+		<!-- End of scripts to auto refresh the image. //-->
+	</p>
+</body>
+</html>
+

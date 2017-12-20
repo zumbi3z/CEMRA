@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+
+<launch>
+
+	<include file="$(find scout_ipcam)/streamer_v2.launch">
+		<arg name="ip" value="99"/>
+		<arg name="stream_num" value="1"/>
+	</include>
+
+
+	<include file="$(find scout_ipcam)/streamer_v2.launch">
+		<arg name="ip" value="98"/>
+		<arg name="stream_num" value="3"/>
+	</include>
+
+
+	<include file="$(find scout_ipcam)/streamer_v2.launch">
+                <arg name="ip" value="97"/>
+                <arg name="stream_num" value="3"/>
+        </include>
+
+</launch>

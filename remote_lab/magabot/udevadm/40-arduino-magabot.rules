@@ -1,0 +1,1 @@
+SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0001", ATTRS{manufacturer}=="Arduino (www.arduino.cc)", ATTRS{product}=="Arduino Uno", MODE="0666", OWNER="rflmota", GROUP="rflmota", SYMLINK+="arduino-magabot"

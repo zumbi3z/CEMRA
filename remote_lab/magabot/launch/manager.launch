@@ -1,0 +1,27 @@
+<launch>
+    
+    <!--node pkg="magabot" type="manager.py" name="manager" output="screen" respawn="true"/-->
+
+    <node pkg="magabot" type="remove_bags.py" name="bag_remover" output="screen" respawn="true"/>
+
+    <node pkg="magabot" type="get_laser_readings.py" name="laser_readings_xy" output="screen"/>
+    
+    <include file="$(find scout_ipcam)/launch/usora_cam1.launch"/>
+    
+    <include file="$(find scout_ipcam)/launch/usora_cam2.launch"/>
+    
+    <include file="$(find magabot)/launch/code_execution.launch"/>
+    
+    <include file="$(find magabot)/launch/record_bag.launch"/>
+    
+    <include file="$(find magabot_joy)/launch/teleop.launch"/>
+
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+
+    <!--node pkg="rosserial_python" type="serial_node.py" name="light_switch" args="/dev/ttyACM0" output="screen"/-->
+
+    <!--include file="$(find magabot)/launch/camera.launch"/-->
+
+    <!--include file="$(find magabot)/launch/camera2.launch"/-->
+
+</launch>

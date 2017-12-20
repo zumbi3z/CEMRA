@@ -1,0 +1,55 @@
+<launch>
+
+    <group ns = "robot_1">
+
+        <node pkg="magabot" type="remove_bags.py" name="bag_remover" output="screen" respawn="true"/>
+
+        <node pkg="magabot" type="get_laser_readings.py" name="laser_readings_xy" output="screen"/>
+
+        <include file="$(find magabot)/launch/code_execution.launch"/>
+        
+        <include file="$(find magabot)/launch/record_bag.launch"/>
+        
+        
+
+    </group>
+
+    <group ns = "robot_2">
+
+        <node pkg="magabot" type="remove_bags.py" name="bag_remover" output="screen" respawn="true"/>
+
+        <node pkg="magabot" type="get_laser_readings.py" name="laser_readings_xy" output="screen"/>
+
+        <include file="$(find magabot)/launch/code_execution.launch"/>
+        
+        <include file="$(find magabot)/launch/record_bag.launch"/>
+        
+        
+
+    </group>
+
+    <group ns = "robot_3">
+
+        <node pkg="magabot" type="remove_bags.py" name="bag_remover" output="screen" respawn="true"/>
+
+        <node pkg="magabot" type="get_laser_readings.py" name="laser_readings_xy" output="screen"/>
+
+        <include file="$(find magabot)/launch/code_execution.launch"/>
+        
+        <include file="$(find magabot)/launch/record_bag.launch"/>
+        
+        
+
+    </group>
+    
+    <include file="$(find cam)/launch/node.launch"/>
+    
+    <include file="$(find scout_ipcam)/launch/usora_cam1.launch"/>
+    
+    <include file="$(find scout_ipcam)/launch/usora_cam2.launch"/>
+    
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+
+    <include file="$(find magabot_joy)/launch/teleop-multi-robots.launch"/>
+
+</launch>

@@ -1,0 +1,3 @@
+AuthType Basic
+AuthUserFile /home/isrusora/html/passwd/passwords
+Require valid-user

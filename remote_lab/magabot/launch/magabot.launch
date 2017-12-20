@@ -1,0 +1,12 @@
+<launch>
+
+  <!-- Rosserial for motors -->
+  <node name="magabot_comm" pkg="rosserial_python" type="serial_node.py" args="_port:=/dev/ttyACM0 _baud:=115200" respawn="true" />
+  
+  <node name="controller" pkg="magabot" type="magabot_node"/>
+   
+  <node name="base_tf_broadcaster1" pkg="tf" type="static_transform_publisher" args="0 0 0.050825 0 0 0 1 base_footprint base_stabilized 100" />
+  
+  <node name="base_tf_broadcaster2" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 base_stabilized base_link 100" />
+  
+</launch>

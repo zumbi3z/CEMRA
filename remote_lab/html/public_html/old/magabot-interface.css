@@ -1,0 +1,60 @@
+
+body { margin: 0px; overflow:hidden;}
+
+h1 { font-family: 'Arial', 'Arial', Arial, sans-serif;
+    font-weight: 600; font-size: 2vw; margin-left: 5%; -webkit-margin-after: 0px;
+;}
+
+
+.clearfix:after {
+   content: " "; /* Older browser do not support empty content */
+   visibility: hidden;
+   display: block;
+   height: 0;
+   clear: both;
+}
+
+#div_container {margin: 0px; overflow: hidden;}
+
+#div_log { width: 35vw; height:100vh; float: left;}
+#div_control { width: 35vw; height:100vh; float: left;}
+#div_feedback { width: 30vw; height:100vh; float: left;}
+
+
+#status_log { width: 90%; margin-left:5%; margin-top:0%; margin-bottom: 5%; resize: none; editable:false;}
+#text_server_address { width: 40%; margin-left:5%; margin-top:0%; }
+#button_connect { width: 25%; ; margin-top:0%; }
+#button_disconnect { width: 25%; ; margin-top:0%; }
+
+#mjpeg1 { width: 90%; height:0px; margin-left: 5%; background-color: #DDDDDD}
+/*.test_canvas { width: 90%; height:45%; margin-left: 5%; background-color: #D3D3D3; border:1px}*/
+.div_video { width: 90%; height:0px; margin-left: 5%; background-color: #DDDDDD}
+#test_canvas { width: 100%; height:100%; background-color: #DDDDDD; border:1px}
+#test_canvas2 { width: 100%; height:100%; background-color: #DDDDDD; border:1px}
+
+
+.div_bumper { width: 40%; height:5vh; border: 0.5vh solid #888888; background-color: #888888; }
+#div_bumper_left { border-radius: 1.2vh 0 0 1.2vh; float: left; margin-left:5%;}
+#div_bumper_right { border-radius: 0 1.2vh 1.2vh 0; float: right; margin-right:5%;}
+
+#div_control_buttons { position:relative; width: 90%; height:0px; margin-left: 5%; }
+
+.button_dir {width: 5vw; height:5vw;}
+#button_stop {width: 6vw; height:6vw;}
+.button_adjust {width: 4vw; height:4vw;}
+
+#div_heading {display: flex; flex-orientation:row;}
+
+#table_heading { max-width:60%; font-family: 'Arial', 'Arial', Arial, sans-serif; flex:0.6; 
+    font-weight: 100; font-size: 1vw; border-radius: 0.8vh; border: 2px solid #888888; margin-left:5%; border-spacing: 0px;}
+
+
+#table_heading td,th{ width: 3.5vw; height: 3vw; border: 2px solid #888888; border-spacing: 0px;}
+
+
+#canvas_heading { width: 35%; flex:0.35; border-radius: 0.8vh; background-color: #888888;}
+
+
+.canvas_ir_sensor {width: 90%; height:3vh; border-radius: 0.8vh; border:0.4vh solid #888888; margin-left:5%;}
+
+#canvas_sonars { width: 90%; height:50%; background-color: #DDDDDD; margin-left:5%;}
