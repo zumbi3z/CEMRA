@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+
+<launch>
+	<rosparam command="load" file="$(find cam)/params/blob_debug.yaml" />
+	<node pkg="cam" type="blob_debug" name="blob_debug" output="screen"/>
+</launch>

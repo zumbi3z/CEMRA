@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<launch>
+
+	<node pkg="cam" type="node" name="node" output="screen">
+		<rosparam command="load" file="$(find cam)/params/tracking_params.yaml" />
+		<rosparam command="load" file="$(find cam)/params/image_settings.yaml" />
+		<rosparam command="load" file="$(find cam)/params/blue_blob_settings.yaml" />
+		<rosparam command="load" file="$(find cam)/params/red_blob_settings.yaml" />
+	</node>
+	
+</launch>

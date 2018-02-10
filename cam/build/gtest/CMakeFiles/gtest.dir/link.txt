@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -std=c++0x -O2 -g   -shared -Wl,-soname,libgtest.so -o /home/amateus/rosbuild_ws/cam/lib/libgtest.so CMakeFiles/gtest.dir/src/gtest-all.cc.o -L/home/amateus/rosbuild_ws/cam/build/gtest/src -lpthread -Wl,-rpath,/home/amateus/rosbuild_ws/cam/build/gtest/src 

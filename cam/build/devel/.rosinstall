@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/amateus/rosbuild_ws/cam/build/devel/setup.sh
