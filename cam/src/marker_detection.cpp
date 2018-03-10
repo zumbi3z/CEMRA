@@ -45,7 +45,7 @@ const double  COST_CNST = 0.21;//This constant is a constraint on the minimal co
 int localization;
 int nquad_freq=4;
 double quad_freq[]={0,1,2,3};
-string quad_freq_name[]={"frame0","frame1","frame2","frame3"};
+string quad_freq_name[]={"robot1","robot2","robot3","robot4"};
 const char* unknown = "unknown";
 
 //................................DETECT MARKER VARIABLES.......................
@@ -120,9 +120,11 @@ MatrixXd Tsol(3,4);
 MatrixXd* Tsols; //Matrix array, eigen doesn't allow 3d matrixes
 double cost;
 double lcost;
-Matrix3d world_points;
+MatrixXd world_points(3,4);
+Matrix3d world_points_l;
 Matrix3d Rl;
-Matrix3d feature_vectors;
+MatrixXd feature_vectors(3,4);
+Matrix3d feature_vectors_l;
 Vector4d markerh3D;
 Vector3d trans;
 Vector3d zcam;
@@ -266,6 +268,7 @@ void initialize_markers(std::string param_name){
     world_points.col(0)<<objQuad[0],objQuad[1],objQuad[2],
     world_points.col(1)<<objQuad[3],objQuad[4],objQuad[5],
     world_points.col(2)<<objQuad[6],objQuad[7],objQuad[8];
+    world_points.col(3)<<objQuad[9],objQuad[10],objQuad[11];
     zcam<<0,1,0;
     xcam<<0,0,1;
     camR<<1,0,0,0,1,0,0,0,1;
@@ -298,7 +301,7 @@ int detect_markers(int no){ //This function extracts markers from blobs
             dx1=(blobs[k].x-cx);
             dy1=(blobs[k].y-cy); 
             radius=dx1*dx1+dy1*dy1;
-            std::cout << "BLOB: "<<  dx1 << " " <<  dy1 << " " << radius << std::endl;
+            std::cout << "BLOB: "<<  dx1 + cx << " " <<  dy1 + cy << " " << radius << std::endl;
             dx1=dx1*(1+1*kx1*radius+1*kx2*radius*radius)+cx;
             dy1=dy1*(1+1*ky1*radius+ky2*radius*radius)+cy;
             blobs[k].x = dx1;
@@ -373,79 +376,110 @@ int detect_markers(int no){ //This function extracts markers from blobs
                                         		continue;
                                         	if(j4==j3) 
                                         		continue;
+
 											//get the undistorted points
 											dx1=vx[j1]; dy1=vy[j1];
 											dx2=vx[j2]; dy2=vy[j2];
 											dx3=vx[j3]; dy3=vy[j3];
 											dx4=vx[j4]; dy4=vy[j4];
+
 											//points seen by the camera
 											// feature_vectors.col(0)<<(dx1-cx)/fx,(dy1-cy)/fy,1;
                                           						 //feature_vectors.col(1)<<(dx2-cx)/fx,(dy2-cy)/fy,1;
                                           						 //feature_vectors.col(2)<<(dx3-cx)/fx,(dy3-cy)/fy,1;
-											feature_vectors << (dx1-cx)/fx, (dx2-cx)/fx, (dx3-cx)/fx, 
-																  (dy1-cy)/fy, (dy2-cy)/fy, (dy3-cy)/fy,
-															  1			 , 1		  , 1;
+											feature_vectors << (dx1-cx)/fx, (dx2-cx)/fx, (dx3-cx)/fx, (dx4-cx)/fx,
+																  (dy1-cy)/fy, (dy2-cy)/fy, (dy3-cy)/fy, (dy4-cy)/fy,
+															  1			 , 1		  , 1         , 1;
 											feature_vectors.col(0) = feature_vectors.col(0)/feature_vectors.col(0).norm();
 											feature_vectors.col(1) = feature_vectors.col(1)/feature_vectors.col(1).norm();
 											feature_vectors.col(2) = feature_vectors.col(2)/feature_vectors.col(2).norm();
+                                            feature_vectors.col(3) = feature_vectors.col(3)/feature_vectors.col(3).norm();
+
+                                            //perform algorithm
                                             printf("computing p3p...\n");
-											//perform algorithm
-											status = P3P::computePoses(feature_vectors, world_points, solutions);
-                                            #ifdef SHOW_MATRICES
-                                                printf("---------------FEATURE VECTORS-------------------\n");
-                                                cout << feature_vectors << endl;
-                                                printf("---------------WORLD POINTS----------------------\n");
-                                                cout << world_points << endl;
-                                                printf("---------------SOLUTIONS FROM P3P-------------------------\n");
-                                                printf("----\n");
-                                                cout << solutions(0) << endl;
-                                                printf("----\n");
-                                                cout << solutions(1) << endl;
-                                                printf("----\n");
-                                                cout << solutions(2) << endl;
-                                                printf("----\n");
-                                                cout << solutions(3) << endl;
-                                                printf("----\n");
-                                            #endif 
-											//compute cost
-											markerh3D << objQuad[9], objQuad[10], objQuad[11], 1;
-											markerh2D << dx4, dy4, 1;
-                                            #ifdef VERBOSE
-                                                printf("STARTED COST EVALUATION!\n");
-                                            #endif
+                                            cout << "[" << j1 << " " << j2 << " " << j3 << " " << j4 << "]" << endl;
+                                            for(int p3p_index = 0; p3p_index < 4; p3p_index++){
+
+                                            feature_vectors_l.col(0) = feature_vectors.col( (0 + p3p_index)%4 );
+                                            feature_vectors_l.col(1) = feature_vectors.col( (1 + p3p_index)%4 );
+                                            feature_vectors_l.col(2) = feature_vectors.col( (2 + p3p_index)%4 );
+                                            world_points_l.col(0) = world_points.col( (0 + p3p_index)%4 );
+                                            world_points_l.col(1) = world_points.col( (1 + p3p_index)%4 );
+                                            world_points_l.col(2) = world_points.col( (2 + p3p_index)%4 );
+											status = P3P::computePoses(feature_vectors_l, world_points_l, solutions);
+
+                                            //cost evaluation
 											for(unsigned int l=0;l<4;l++){
+
+                                                //prepare solution
+                                                //cout << "SOLUTION" << endl;
+                                                //cout << solutions(l) << endl;
 												Rl.col(0)=solutions(l).col(0);
                                                 Rl.col(1)=solutions(l).col(1);
                                                 Rl.col(2)=solutions(l).col(2);
                                                 Rl=Rl.inverse().eval();
 												trans=-Rl*solutions(l).col(3);
 												Tl.col(0)=Rl.col(0); Tl.col(1)=Rl.col(1); Tl.col(2)=Rl.col(2); Tl.col(3)=trans;
-												markerh3DProjected = Tl * markerh3D;
-                                              	markerh2DPredicted<<fx*(markerh3DProjected(0)/markerh3DProjected(2))+cx,fy*(markerh3DProjected(1)/markerh3DProjected(2))+cy,1;
-                                                #ifdef SHOW_MATRICES
-                                                    printf("MARKERS 2D ORIGINAL AND PREDICTED\n");
-                                                    cout << markerh2D << endl;
-                                                    cout << markerh2DPredicted << endl;
-                                                    printf("-------------");
-                                                #endif
-                                                lcost=(markerh2DPredicted-markerh2D).norm();
-                                                if( ( (zcam.dot(Rl.col(2))<-0.0) && (zcam.dot(Rl.col(2))>-0.9))  && (xcam.dot(Rl.col(2))<2) ){
-                                                if(lcost < cost){ //is this the smallest cost so far?
-                                                	 //if it is, does it satisfy the conditions of a quadrotor flying? (looking at us, and not turned upside down)
-                                                    //conditions set for a standard camera reference frame (x - right, y - down, z - front)
-                                                	//if(((Rl.col(0) + Rl.col(1)).dot(trans)<0) && (zcam.dot(Rl.col(2))<-0.5)){
+
+                                                //find projection error for each beacons
+                                                Vector4d markerh3D_l;
+                                                Vector3d markerh2D_l;
+                                                double lcosts[4];
+                                                markerh3D_l << objQuad[0], objQuad[1], objQuad[2], 1;
+                                                markerh2D_l << dx1, dy1, 1;
+                                                markerh3DProjected = Tl * markerh3D_l;
+                                                markerh2DPredicted<<fx*(markerh3DProjected(0)/markerh3DProjected(2))+cx,fy*(markerh3DProjected(1)/markerh3DProjected(2))+cy,1;
+                                                lcosts[0]=(markerh2DPredicted-markerh2D_l).norm();
+                                                //cout << "cost1: " << lcosts[0] << "; ";
+                                                markerh3D_l << objQuad[3], objQuad[4], objQuad[5], 1;
+                                                markerh2D_l << dx2, dy2, 1;
+                                                markerh3DProjected = Tl * markerh3D_l;
+                                                markerh2DPredicted<<fx*(markerh3DProjected(0)/markerh3DProjected(2))+cx,fy*(markerh3DProjected(1)/markerh3DProjected(2))+cy,1;
+                                                lcosts[1]=(markerh2DPredicted-markerh2D_l).norm();
+                                                //cout << "cost2: " << lcosts[1] << "; ";
+                                                markerh3D_l << objQuad[6], objQuad[7], objQuad[8], 1;
+                                                markerh2D_l << dx3, dy3, 1;
+                                                markerh3DProjected = Tl * markerh3D_l;
+                                                markerh2DPredicted<<fx*(markerh3DProjected(0)/markerh3DProjected(2))+cx,fy*(markerh3DProjected(1)/markerh3DProjected(2))+cy,1;
+                                                lcosts[2]=(markerh2DPredicted-markerh2D_l).norm();
+                                                //cout << "cost3: " << lcosts[2] << "; ";
+                                                markerh3D_l << objQuad[9], objQuad[10], objQuad[11], 1;
+                                                markerh2D_l << dx4, dy4, 1;
+                                                markerh3DProjected = Tl * markerh3D_l;
+                                                markerh2DPredicted<<fx*(markerh3DProjected(0)/markerh3DProjected(2))+cx,fy*(markerh3DProjected(1)/markerh3DProjected(2))+cy,1;
+                                                lcosts[3]=(markerh2DPredicted-markerh2D_l).norm();
+                                                //cout << "cost4: " << lcosts[3] << ";" << endl;
+
+                                                //find the largest projection error
+                                                double lcost_max = 0;
+                                                for(int index = 0; index < 4; index++){
+                                                    if(lcosts[index] > lcost_max)
+                                                        lcost_max = lcosts[index];
+                                                }
+
+                                                //select only solutions that have small projection errors for all the beacons
+                                                if(lcost_max < cost){
+
+                                                    cout << "Here1" << endl;
+
+                                                    if( (zcam.dot(Rl.col(2))<-0.0) ){
+                                                    //if( (zcam.dot(Rl.col(2))<-0.0)  && (xcam.dot(Rl.col(2))<-0.3) ){
+                                                    //if( ( (zcam.dot(Rl.col(2))<-0.0) && (zcam.dot(Rl.col(2))>-0.9))  && (xcam.dot(Rl.col(2))<0) ){
                                                     
-                                                    
-                                                        cout << zcam << endl;
-                                                        cout << Rl << endl;
-                                                		cost=lcost;
+                                                        cout << "Here2" << endl;
+                                                        cout << camR * Tl << endl;
+                                                        cout << "[" << j1 << " " << j2 << " " << j3 << " " << j4 << "] -> " << l << endl;
+                                                        cout << markerh3DProjected << endl << "and " << endl << markerh2DPredicted << endl << "and" << endl << markerh2D << endl;
+                                                        cout << "cost = " << lcost_max << endl;
+                                                		cost=lcost_max;
 														Tsol=Tl;
 														aux1=vx[j1]; aux2=vx[j2]; aux3=vx[j3]; aux4=vx[j4];
 														aux1y=vy[j1]; aux2y=vy[j2]; aux3y=vy[j3]; aux4y=vy[j4];
 
-                                                	}
+                                                    }
                                                 }
 											}
+                                            }
                     					}
                     				}
                     			}
@@ -644,7 +678,7 @@ int track_markers(unsigned char* buf,unsigned int step, int width, int height){
     }
 
     //Search for red blobs
-    /*for(vector<marker>::iterator it = marker_list.begin() ; it != marker_list.end(); ++it){
+    for(vector<marker>::iterator it = marker_list.begin() ; it != marker_list.end(); ++it){
         localization=0;
         detect_blobs(buf,step,red_blob_sl,red_blob_sh,red_blob_hl,red_blob_hh,red_blob_vl,red_blob_vh,it->imx0_LED,it->imxf_LED,it->imy0_LED,it->imyf_LED, width, height, RED,0);
         int old_state=it->state;
@@ -685,30 +719,29 @@ int track_markers(unsigned char* buf,unsigned int step, int width, int height){
         if(it->max>MARKER_THRESHOLD){ //THRESHOLD           
             //get frequency 
             freq=0,total=0;
-            for(int l=0;l<10;l++)
+            cout << "Frequencies: ";
+            for(int l=0;l<10;l++){
+                cout << it->frequencies[l] << " ";
                 if(it->frequencies[l]>4){
                     freq+=(double)it->frequencies[l]*l;
                     total+=(double)it->frequencies[l];
                 }
-            freq/=(double)total;
-        
-        //get the quadrotor name from the computed frequency
-        if(round(freq)>3 || round(freq)<0){
-        	#ifdef VERBOSE
-            	printf("WARNING: selected frequency index out of bounds\n");
-        	#endif
-        }
-        else{
-            it->name = quad_freq_name[(int)round(freq)].c_str(); //this was not allocated!
-
-
-            if(it->name == "frame0"){
-            	for(int i=0; i<15;i++)
-            		objQuad[i]=improved_objQuad[i];
             }
-            //cout << "quad id = " << it->name << endl;
+            cout << endl;
+            if(total != 0)
+                freq/=(double)total;
+        
+            //get the quadrotor name from the computed frequency
+            if(round(freq)>3 || round(freq)<0){
+            	#ifdef VERBOSE
+                	printf("WARNING: selected frequency index out of bounds\n");
+            	#endif
+            }
+            else{
+                it->name = quad_freq_name[(int)round(freq)].c_str(); //this was not allocated!
+                cout << "quad id = " << it->name << endl;
+            }
         }
     }
-    }*/
     return nmarkers;
 }

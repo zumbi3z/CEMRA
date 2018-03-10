@@ -18,6 +18,7 @@
 #include <image_transport/image_transport.h>
 #include <tf/transform_datatypes.h>
 #include "geometry_msgs/PoseStamped.h"
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 //user libraries
 //#include "cam/detections.h"
 #include "cam/blob_detection.h"
@@ -43,24 +44,17 @@ unsigned char* bufb,* buf;
 blob* blp;
 int nblobs,nobjects;
 
-ofstream cam_yaw_outputfile;
-ofstream cam_outputfile;
-ofstream laser_outputfile;
 int toggle_first_pose = 0;
 cam::QuadPose first_pose;
 double value = 0.0;
 double last_value = 0.0;
-VectorXd LaserVec(2);
-MatrixXd RLaser2Cam(2,2);
 int width;
 int height;
+
 //static ros::Publisher rgb_image_pub;
 static ros::Publisher bin_image_pub;
-//static ros::Publisher detections_pub;
-static ros::Publisher markers_pub;
-
 static ros::Publisher cam_eval;
-static ros::Publisher laser_eval;
+
 geometry_msgs::PoseStamped msg;
 
 void image_reception_callback(const sensor_msgs::ImageConstPtr& msg){
@@ -72,9 +66,9 @@ void image_reception_callback(const sensor_msgs::ImageConstPtr& msg){
 	unsigned long int cnt=0;
     for(unsigned int l=0;l<img.height;l++){
         for(unsigned int k=0;k<img.width;k++){
-            buf[cnt]=img.data[cnt];
-            buf[cnt+1]=img.data[cnt+1];
-            buf[cnt+2]=img.data[cnt+2];
+            buf[cnt]=img.data[cnt + 0 ];
+            buf[cnt+1]=img.data[cnt + 1];
+            buf[cnt+2]=img.data[cnt + 2];
             cnt+=3;
             
         }
@@ -95,62 +89,40 @@ void image_reception_callback(const sensor_msgs::ImageConstPtr& msg){
     fillImage(bin_img,"mono8",img.height,img.width,img.step/3,bufb);
     bin_image_pub.publish(bin_img);
 
-	//blob detection and publish binary image
-    track_markers(buf, 3, img.width, img.height);
-	
+	//detect robots
+    track_markers(buf, 3, img.width, img.height);	
 	detected_quads = get_markers();
-	cam::QuadPoseList quad_poses_msg;
-	quad_poses_msg.header.stamp = ros::Time::now();
-	Matrix3d rotation;
+
+	//for each detected robot
 	for(vector<marker>::iterator it = detected_quads->begin(); it != detected_quads->end(); ++it){
-		cam::QuadPose quad_pose;
-		quad_pose.name = it->name;
-		quad_pose.position.x = it->T.col(3)[0];
-		quad_pose.position.y = it->T.col(3)[1];
-		quad_pose.position.z = it->T.col(3)[2];
-		rotation.col(0) = it->T.col(0);
-		rotation.col(1) = it->T.col(1);
-		rotation.col(2) = it->T.col(2);
-		Vector3d ea = rotation.eulerAngles(2, 1, 0); //the order of the angles matter
-		double roll = ea[2];
-		double pitch = ea[1];
-		double yaw = ea[0];
-		quad_pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(roll,pitch,yaw);
-		if(it->failures == 0)
-		    quad_pose.pose_updated = 1;
-		else
-		    quad_pose.pose_updated = 0;
-		quad_poses_msg.poses.push_back(quad_pose);
-		if(quad_pose.name == "unknown" || quad_pose.name == "frame0"){
-		//Always save the first pose for convenience sake
-			if(toggle_first_pose == 0){
-				first_pose = quad_pose;
-				toggle_first_pose = 1;
-			}
-			#ifdef VERBOSE
-				//we kind of only  want yaw
-				printf("YAW: %f\n", yaw*(180.0/PI));
-			#endif			
-			#ifdef LASER_COMPARE
-				quad_pose.position.x = first_pose.position.x - quad_pose.position.x;
-				quad_pose.position.y = first_pose.position.y - quad_pose.position.y;
-			#endif
-			//Write yaw to a csv file
-			std::stringstream yss;
-			yss <<  yaw*(180.0/PI);
-			std::string ys = yss.str();
-			cam_yaw_outputfile << ys << endl;			
-			//Write to a csv file
-			std::stringstream ss;
-			ss << quad_pose.position.x << "," << quad_pose.position.y << "," << quad_pose.position.z << "," << roll << "," << pitch << "," << yaw;
-			std::string s = ss.str();
-			cam_outputfile << s << endl;
-			cout << s << endl;
-			//Write to a topic
-			cam_eval.publish(quad_pose);
+
+		//check if there were any errors in the detection of the robot
+		if(it->failures == 0){
+
+			//fill positioning structure that is going to be sent to ROS
+			geometry_msgs::PoseWithCovarianceStamped robot_pose;
+			robot_pose.header.stamp = ros::Time::now();
+			robot_pose.header.frame_id = it->name;
+			robot_pose.pose.pose.position.x = it->T.col(3)[0];
+			robot_pose.pose.pose.position.y = it->T.col(3)[1];
+			robot_pose.pose.pose.position.z = it->T.col(3)[2];
+			Matrix3d rotation;
+			rotation.col(0) = it->T.col(0);
+			rotation.col(1) = it->T.col(1);
+			rotation.col(2) = it->T.col(2);
+			Vector3d ea = rotation.eulerAngles(2, 1, 0); //the order of the angles matter
+			Quaternion<double> q(rotation);
+			double roll = ea[2];
+			double pitch = ea[1];
+			double yaw = ea[0];
+			robot_pose.pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(roll,pitch,yaw);
+
+			//send positioning structure to ROS
+			cam_eval.publish(robot_pose);
+
 		}
+
 	}
-	markers_pub.publish(quad_poses_msg);
 	
     return;
 }
@@ -170,31 +142,14 @@ void readImageParams(std::string param_name){
 	//cout <<"WORKS: " << width << " " << height << endl;
 
 }
-void getLaser(geometry_msgs::PoseStamped data) {
-	LaserVec(0) = data.pose.position.x;
-	LaserVec(1) = data.pose.position.y;
-	LaserVec = RLaser2Cam * LaserVec;
-	double laser_yaw=atan2(2*(data.pose.orientation.w*data.pose.orientation.z + data.pose.orientation.x*data.pose.orientation.y),(1 - 2*(data.pose.orientation.y*data.pose.orientation.y + data.pose.orientation.z*data.pose.orientation.z)));
-	#ifdef VERBOSE
-		ROS_INFO("LASER_X: [%f], LASER_Y: [%f] LASER_YAW: %f", data.pose.position.x, data.pose.position.y, laser_yaw * (180.0/PI));
-	#endif
-	msg = data;
-	msg.pose.position.x = -LaserVec(0);
-	msg.pose.position.y = LaserVec(1);
-        std::stringstream ss;
-	ss << msg.pose.position.x << "," << msg.pose.position.y << "," << laser_yaw;
-	std::string s = ss.str();
-	cam_outputfile << s << endl;
-	cout << s << endl;
-	laser_eval.publish(msg);
 
-}
 int main(int argc, char** argv){
 
 	//Initialize ROS
 	ros::init(argc, argv,"node/");
 	ros::NodeHandle nh;
 
+	//initialize node parameters
 	readImageParams("/node/");
 
 	//Initialize the sensor
@@ -203,24 +158,14 @@ int main(int argc, char** argv){
     bufb = get_binary_image();
     blp = get_blobs();
     initialize_markers("/node/");
-    cam_yaw_outputfile.open("yaw_cam_data.csv");
-    cam_outputfile.open("cam_data.csv");
-    laser_outputfile.open("laser_data.csv");
     
-
-	RLaser2Cam << cos(135 * PI/180.0), -sin(135 * PI/180.0),
-           sin(135 * PI/180.0), cos(135 * PI/180.0);
     //subscribers
     ros::Subscriber image_sub=nh.subscribe("camera1/image_raw", 1, image_reception_callback); // only 1 in buffer size to drop other images if processing is not finished
-    ros::Subscriber laser = nh.subscribe("/slam_out_pose", 1, getLaser);
+
     //publishers
     //rgb_image_pub=nh.advertise<sensor_msgs::Image>("node/rgb_image",1);
     bin_image_pub=nh.advertise<sensor_msgs::Image>("node/binary_image",1);
-    //detections_pub=nh.advertise<cam::detections>("node/detections",1);
-    markers_pub = nh.advertise<cam::QuadPoseList>("node/markers",1);
- 
-    cam_eval = nh.advertise<cam::QuadPose>("cam_pose",1);
-    laser_eval = nh.advertise<geometry_msgs::PoseStamped>("laser_pose",1);
+    cam_eval = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/robot2/cam_pose",1);
     ros::Rate loop_rate(RATE);
    
     //main loop
