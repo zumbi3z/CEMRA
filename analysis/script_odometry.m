@@ -1,9 +1,44 @@
+%cleanup
 close all;
 clear all;
 clc;
 
-command = load('_robot2_cmd_vel_fixed.txt');
-odometry = load('_robot2_odom.txt');
+%load matlab libraries
+matlab_repo = '/media/duartecdias/5A8CD5D48CD5AAB1/Dropbox/Public/Áreas/Trabalho/Investigação/Doutoramento/IST-EPFL/Tese/Implementação';
+addpath(matlab_repo);
+matlab_libraries = strcat(matlab_repo, '/matlab_libraries/CEMRA');
+addpath(strcat(matlab_libraries, '/DataAnalysis'));
+
+%main location
+exp_repo = '/home/duartecdias/Repos/CEMRA/bags/bags-v3/';
+setenv('EXP_REPO', exp_repo);
+
+%so the version from matlab is not used (errors on webots and ros are generated otherwise)
+setenv('LD_PRELOAD','/usr/lib/x86_64-linux-gnu/libstdc++.so.6:/usr/lib/x86_64-linux-gnu/libexpat.so');
+
+%parameters
+exp_number = 2;
+mesh_repo = strcat(exp_repo, 'mesh/Exp', num2str(exp_number), '/');
+setenv('MESH_REPO', mesh_repo);
+
+%process bag
+if exist(strcat(mesh_repo, '_robot2_cmd_vel_fixed.txt'), 'file') ~= 2
+!roscore &
+!roscore_pid=$!
+!${EXP_REPO}extract_datasets.sh ${MESH_REPO}mesh.bag /robot2/cmd_vel_fixed /robot2/odom
+!kill -SIGINT $roscore_pid
+!mv _robot2_cmd_vel_fixed.txt ${MESH_REPO}
+!mv _robot2_odom.txt ${MESH_REPO}
+end
+
+%load bag
+files = [];
+ind = 1;
+s.name_i = strcat(mesh_repo, '_robot2_cmd_vel_fixed.txt'); s.name_o = strcat(mesh_repo, 'command.txt'); s.nheaders = 1; s.eliminations = [];  s.processed = 0; files = cat(1, files, s); fids.COMMAND = ind; ind = ind + 1;
+s.name_i = strcat(mesh_repo, '_robot2_odom.txt'); s.name_o = strcat(mesh_repo, 'odometry.txt'); s.nheaders = 1; s.eliminations = [4,5];  s.processed = 0; files = cat(1, files, s); fids.ODOMETRY = ind; ind = ind + 1;
+files = get_bag_file_names(mesh_repo, files);
+command = load(files(fids.COMMAND).name_o);
+odometry = load(files(fids.ODOMETRY).name_o);
 
 %extract predicted commands
 time_command = command(:, 1)/10^9;

@@ -237,12 +237,14 @@ void measurementProjection(camera_parameters* cam, VectorXd x3D, MatrixXd R3D, V
 
 	//defining the projection matrix
 	MatrixXd Pr(2, 3);
+	MatrixXd Pr2;
 	Pr << 1, 0, 0,
 	      0, 1, 0;
 
 	//computing 2D measurement (also transforming the uncertainty)
 	x2D = Pr * (cam->R*x3D + cam->t);
-	R2D = (Pr*cam->R) * R3D * (Pr*cam->R).transpose();
+	Pr2 = (Pr*cam->R);
+	R2D = (Pr*cam->R) * R3D * Pr2.transpose();
 
 }
 
