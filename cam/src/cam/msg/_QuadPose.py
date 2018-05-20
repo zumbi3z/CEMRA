@@ -82,12 +82,9 @@ float64 w
       if python3 or type(_x) == unicode:
         _x = _x.encode('utf-8')
         length = len(_x)
-      if python3:
-        buff.write(struct.pack('<I%sB'%length, length, *_x))
-      else:
-        buff.write(struct.pack('<I%ss'%length, length, _x))
+      buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_struct_7db.pack(_x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w, _x.pose_updated))
+      buff.write(_get_struct_7db().pack(_x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w, _x.pose_updated))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -114,7 +111,7 @@ float64 w
       _x = self
       start = end
       end += 57
-      (_x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w, _x.pose_updated,) = _struct_7db.unpack(str[start:end])
+      (_x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w, _x.pose_updated,) = _get_struct_7db().unpack(str[start:end])
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e) #most likely buffer underfill
@@ -132,12 +129,9 @@ float64 w
       if python3 or type(_x) == unicode:
         _x = _x.encode('utf-8')
         length = len(_x)
-      if python3:
-        buff.write(struct.pack('<I%sB'%length, length, *_x))
-      else:
-        buff.write(struct.pack('<I%ss'%length, length, _x))
+      buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_struct_7db.pack(_x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w, _x.pose_updated))
+      buff.write(_get_struct_7db().pack(_x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w, _x.pose_updated))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -165,10 +159,18 @@ float64 w
       _x = self
       start = end
       end += 57
-      (_x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w, _x.pose_updated,) = _struct_7db.unpack(str[start:end])
+      (_x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w, _x.pose_updated,) = _get_struct_7db().unpack(str[start:end])
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e) #most likely buffer underfill
 
 _struct_I = genpy.struct_I
-_struct_7db = struct.Struct("<7db")
+def _get_struct_I():
+    global _struct_I
+    return _struct_I
+_struct_7db = None
+def _get_struct_7db():
+    global _struct_7db
+    if _struct_7db is None:
+        _struct_7db = struct.Struct("<7db")
+    return _struct_7db

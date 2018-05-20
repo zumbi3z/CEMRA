@@ -96,16 +96,13 @@ float64 w
     """
     try:
       _x = self
-      buff.write(_struct_3I.pack(_x.header.seq, _x.header.stamp.secs, _x.header.stamp.nsecs))
+      buff.write(_get_struct_3I().pack(_x.header.seq, _x.header.stamp.secs, _x.header.stamp.nsecs))
       _x = self.header.frame_id
       length = len(_x)
       if python3 or type(_x) == unicode:
         _x = _x.encode('utf-8')
         length = len(_x)
-      if python3:
-        buff.write(struct.pack('<I%sB'%length, length, *_x))
-      else:
-        buff.write(struct.pack('<I%ss'%length, length, _x))
+      buff.write(struct.pack('<I%ss'%length, length, _x))
       length = len(self.poses)
       buff.write(_struct_I.pack(length))
       for val1 in self.poses:
@@ -114,17 +111,14 @@ float64 w
         if python3 or type(_x) == unicode:
           _x = _x.encode('utf-8')
           length = len(_x)
-        if python3:
-          buff.write(struct.pack('<I%sB'%length, length, *_x))
-        else:
-          buff.write(struct.pack('<I%ss'%length, length, _x))
+        buff.write(struct.pack('<I%ss'%length, length, _x))
         _v1 = val1.position
         _x = _v1
-        buff.write(_struct_3d.pack(_x.x, _x.y, _x.z))
+        buff.write(_get_struct_3d().pack(_x.x, _x.y, _x.z))
         _v2 = val1.orientation
         _x = _v2
-        buff.write(_struct_4d.pack(_x.x, _x.y, _x.z, _x.w))
-        buff.write(_struct_b.pack(val1.pose_updated))
+        buff.write(_get_struct_4d().pack(_x.x, _x.y, _x.z, _x.w))
+        buff.write(_get_struct_b().pack(val1.pose_updated))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -142,7 +136,7 @@ float64 w
       _x = self
       start = end
       end += 12
-      (_x.header.seq, _x.header.stamp.secs, _x.header.stamp.nsecs,) = _struct_3I.unpack(str[start:end])
+      (_x.header.seq, _x.header.stamp.secs, _x.header.stamp.nsecs,) = _get_struct_3I().unpack(str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -171,15 +165,15 @@ float64 w
         _x = _v3
         start = end
         end += 24
-        (_x.x, _x.y, _x.z,) = _struct_3d.unpack(str[start:end])
+        (_x.x, _x.y, _x.z,) = _get_struct_3d().unpack(str[start:end])
         _v4 = val1.orientation
         _x = _v4
         start = end
         end += 32
-        (_x.x, _x.y, _x.z, _x.w,) = _struct_4d.unpack(str[start:end])
+        (_x.x, _x.y, _x.z, _x.w,) = _get_struct_4d().unpack(str[start:end])
         start = end
         end += 1
-        (val1.pose_updated,) = _struct_b.unpack(str[start:end])
+        (val1.pose_updated,) = _get_struct_b().unpack(str[start:end])
         self.poses.append(val1)
       return self
     except struct.error as e:
@@ -194,16 +188,13 @@ float64 w
     """
     try:
       _x = self
-      buff.write(_struct_3I.pack(_x.header.seq, _x.header.stamp.secs, _x.header.stamp.nsecs))
+      buff.write(_get_struct_3I().pack(_x.header.seq, _x.header.stamp.secs, _x.header.stamp.nsecs))
       _x = self.header.frame_id
       length = len(_x)
       if python3 or type(_x) == unicode:
         _x = _x.encode('utf-8')
         length = len(_x)
-      if python3:
-        buff.write(struct.pack('<I%sB'%length, length, *_x))
-      else:
-        buff.write(struct.pack('<I%ss'%length, length, _x))
+      buff.write(struct.pack('<I%ss'%length, length, _x))
       length = len(self.poses)
       buff.write(_struct_I.pack(length))
       for val1 in self.poses:
@@ -212,17 +203,14 @@ float64 w
         if python3 or type(_x) == unicode:
           _x = _x.encode('utf-8')
           length = len(_x)
-        if python3:
-          buff.write(struct.pack('<I%sB'%length, length, *_x))
-        else:
-          buff.write(struct.pack('<I%ss'%length, length, _x))
+        buff.write(struct.pack('<I%ss'%length, length, _x))
         _v5 = val1.position
         _x = _v5
-        buff.write(_struct_3d.pack(_x.x, _x.y, _x.z))
+        buff.write(_get_struct_3d().pack(_x.x, _x.y, _x.z))
         _v6 = val1.orientation
         _x = _v6
-        buff.write(_struct_4d.pack(_x.x, _x.y, _x.z, _x.w))
-        buff.write(_struct_b.pack(val1.pose_updated))
+        buff.write(_get_struct_4d().pack(_x.x, _x.y, _x.z, _x.w))
+        buff.write(_get_struct_b().pack(val1.pose_updated))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -241,7 +229,7 @@ float64 w
       _x = self
       start = end
       end += 12
-      (_x.header.seq, _x.header.stamp.secs, _x.header.stamp.nsecs,) = _struct_3I.unpack(str[start:end])
+      (_x.header.seq, _x.header.stamp.secs, _x.header.stamp.nsecs,) = _get_struct_3I().unpack(str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -270,22 +258,45 @@ float64 w
         _x = _v7
         start = end
         end += 24
-        (_x.x, _x.y, _x.z,) = _struct_3d.unpack(str[start:end])
+        (_x.x, _x.y, _x.z,) = _get_struct_3d().unpack(str[start:end])
         _v8 = val1.orientation
         _x = _v8
         start = end
         end += 32
-        (_x.x, _x.y, _x.z, _x.w,) = _struct_4d.unpack(str[start:end])
+        (_x.x, _x.y, _x.z, _x.w,) = _get_struct_4d().unpack(str[start:end])
         start = end
         end += 1
-        (val1.pose_updated,) = _struct_b.unpack(str[start:end])
+        (val1.pose_updated,) = _get_struct_b().unpack(str[start:end])
         self.poses.append(val1)
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e) #most likely buffer underfill
 
 _struct_I = genpy.struct_I
-_struct_3I = struct.Struct("<3I")
-_struct_b = struct.Struct("<b")
-_struct_4d = struct.Struct("<4d")
-_struct_3d = struct.Struct("<3d")
+def _get_struct_I():
+    global _struct_I
+    return _struct_I
+_struct_3I = None
+def _get_struct_3I():
+    global _struct_3I
+    if _struct_3I is None:
+        _struct_3I = struct.Struct("<3I")
+    return _struct_3I
+_struct_b = None
+def _get_struct_b():
+    global _struct_b
+    if _struct_b is None:
+        _struct_b = struct.Struct("<b")
+    return _struct_b
+_struct_4d = None
+def _get_struct_4d():
+    global _struct_4d
+    if _struct_4d is None:
+        _struct_4d = struct.Struct("<4d")
+    return _struct_4d
+_struct_3d = None
+def _get_struct_3d():
+    global _struct_3d
+    if _struct_3d is None:
+        _struct_3d = struct.Struct("<3d")
+    return _struct_3d

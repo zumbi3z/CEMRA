@@ -716,6 +716,11 @@ int track_markers(unsigned char* buf,unsigned int step, int width, int height){
             }    
         }
 
+        /*cout << "FREQUENCIES: [";
+        for(int l=0;l<10;l++)
+            cout <<  it->frequencies[l] << " ";
+        cout << "]" << endl;*/
+
         if(it->max>MARKER_THRESHOLD){ //THRESHOLD           
             //get frequency 
             freq=0,total=0;
@@ -730,6 +735,7 @@ int track_markers(unsigned char* buf,unsigned int step, int width, int height){
             cout << endl;
             if(total != 0)
                 freq/=(double)total;
+            cout<< "FREQ = " << freq << endl;
         
             //get the quadrotor name from the computed frequency
             if(round(freq)>3 || round(freq)<0){

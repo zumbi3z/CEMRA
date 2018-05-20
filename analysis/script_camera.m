@@ -42,12 +42,12 @@ x_beacon = [0.20,0.0,0.0; 0.0,0.13,0.0; 0.10,0.10,0.00; 0.0,-0.02,0.00;]'; %test
 %% Simulate camera in ROS with a theoretical strucutre, so it can be detected by the software
 
 %prepare simulation
-close all;
-clear;
-clc;
+% close all;
+% clear;
+% clc;
 
 %main location
-exp_repo = '/home/duartecdias/Repos/CEMRA/cam/analysis/bags-v3/';
+exp_repo = '/home/duartecdias/Repos/CEMRA/analysis/';
 
 %load camera parameters
 cam = load(strcat(exp_repo, 'camera.mat'), 'cam');
@@ -65,7 +65,7 @@ pixel_n = 0:cam.width*cam.height-1;
 im = zeros(cam.width, cam.height);
 
 %connect to ROS
-%rosinit;
+% rosinit;
 
 %create message structure
 pub = rospublisher('/camera1/image_raw');

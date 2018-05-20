@@ -53,7 +53,7 @@ int height;
 
 //static ros::Publisher rgb_image_pub;
 static ros::Publisher bin_image_pub;
-static ros::Publisher cam_eval;
+static ros::Publisher cam_eval[10];
 
 geometry_msgs::PoseStamped msg;
 
@@ -94,12 +94,14 @@ void image_reception_callback(const sensor_msgs::ImageConstPtr& msg){
 	detected_quads = get_markers();
 
 	//for each detected robot
+	cout << "Detected robots:" << endl;
 	for(vector<marker>::iterator it = detected_quads->begin(); it != detected_quads->end(); ++it){
 
 		//check if there were any errors in the detection of the robot
 		if(it->failures == 0){
 
 			//fill positioning structure that is going to be sent to ROS
+			cout << it->name << endl;
 			geometry_msgs::PoseWithCovarianceStamped robot_pose;
 			robot_pose.header.stamp = ros::Time::now();
 			robot_pose.header.frame_id = it->name;
@@ -118,7 +120,11 @@ void image_reception_callback(const sensor_msgs::ImageConstPtr& msg){
 			robot_pose.pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(roll,pitch,yaw);
 
 			//send positioning structure to ROS
-			cam_eval.publish(robot_pose);
+			if(!strcmp(robot_pose.header.frame_id.c_str(), "robot1")) cam_eval[0].publish(robot_pose);
+			else if(!strcmp(robot_pose.header.frame_id.c_str(), "robot2")) cam_eval[1].publish(robot_pose);
+			else if(!strcmp(robot_pose.header.frame_id.c_str(), "robot3")) cam_eval[2].publish(robot_pose);
+			else if(!strcmp(robot_pose.header.frame_id.c_str(), "robot4")) cam_eval[3].publish(robot_pose);
+			else if(!strcmp(robot_pose.header.frame_id.c_str(), "unknown")) cam_eval[4].publish(robot_pose);
 
 		}
 
@@ -165,7 +171,11 @@ int main(int argc, char** argv){
     //publishers
     //rgb_image_pub=nh.advertise<sensor_msgs::Image>("node/rgb_image",1);
     bin_image_pub=nh.advertise<sensor_msgs::Image>("node/binary_image",1);
-    cam_eval = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/robot2/cam_pose",1);
+    cam_eval[0] = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/robot1/cam_pose",1);
+    cam_eval[1] = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/robot2/cam_pose",1);
+    cam_eval[2] = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/robot3/cam_pose",1);
+    cam_eval[3] = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/robot4/cam_pose",1);
+    cam_eval[4] = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/unknown/cam_pose",1);
     ros::Rate loop_rate(RATE);
    
     //main loop
