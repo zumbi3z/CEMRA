@@ -157,8 +157,8 @@ void DifferentialDriveModel(differential_drive_parameters* ddrive, VectorXd u, M
 	Q(1, 1) = 4 * (ddrive->q2 * u(1)) * (ddrive->q2 * u(1));
 
 	//giving a minimum noise
-	if(Q(0, 0) < 0.005 * 0.005) Q(0, 0) = 4 * 0.005 * 0.005;
-	if(Q(1, 1) < 0.03 * 0.03) Q(1, 1) = 4 * 0.03 * 0.03;
+	if(Q(0, 0) < 0.005 * 0.005) Q(0, 0) = 10 * 0.005 * 0.005;
+	if(Q(1, 1) < 0.03 * 0.03) Q(1, 1) = 10 * 0.03 * 0.03;
 
 	//ignorying drifts or bias that might occur
 

@@ -30,12 +30,14 @@ using namespace YAML;
 //Macros
 #define MAX_FEATURES 500
 #define MAX_MARKERS 50
+//#define VERBOSE
+//#define VERBOSE_1
 //Constants
 const int BLUE = 1;
 const int RED = 0;
 //Increased number of allowed failuers
 const int MIN_NUM_FAILURES = 7; //minimal number of failures allowed for a tracked frame
-const double RED_BLOB_THRESHOLD_SCALE_FACTOR = 0.4;
+const double RED_BLOB_THRESHOLD_SCALE_FACTOR = 0.3;
 const int MARKER_THRESHOLD = 4;
 
 const double  COST_CNST = 0.21;//This constant is a constraint on the minimal cost for theory that is 0.5*(fx+fy)/distance
@@ -138,6 +140,25 @@ vector<marker> marker_list;
 Vector3d markerh3DProjected, markerh2D, markerh2DPredicted, trans1;
 int imx0[MAX_MARKERS],imy0[MAX_MARKERS],imxf[MAX_MARKERS],imyf[MAX_MARKERS];
 int imx0_LED[MAX_MARKERS],imy0_LED[MAX_MARKERS],imxf_LED[MAX_MARKERS],imyf_LED[MAX_MARKERS];
+
+void localization_beacon_geometric_center(double* xs, double* avg, int n){
+
+    //zeroing average
+    avg[0] = avg[1] = avg[2] = 0.0;
+
+    //adding 3D position of different beacons
+    for(int k = 0; k < n; k++){
+        avg[0] += xs[3*k + 0];
+        avg[1] += xs[3*k + 1];
+        avg[2] += xs[3*k + 2];
+    }
+
+    //average with the number of beacons
+    avg[0] /= n;
+    avg[1] /= n;
+    avg[2] /= n;
+
+}
 
 //debug 
 double aux1,aux2,aux3,aux4,aux1y,aux2y,aux3y,aux4y;
@@ -301,7 +322,9 @@ int detect_markers(int no){ //This function extracts markers from blobs
             dx1=(blobs[k].x-cx);
             dy1=(blobs[k].y-cy); 
             radius=dx1*dx1+dy1*dy1;
+            #ifdef VERBOSE_1
             std::cout << "BLOB: "<<  dx1 + cx << " " <<  dy1 + cy << " " << radius << std::endl;
+            #endif
             dx1=dx1*(1+1*kx1*radius+1*kx2*radius*radius)+cx;
             dy1=dy1*(1+1*ky1*radius+ky2*radius*radius)+cy;
             blobs[k].x = dx1;
@@ -353,13 +376,17 @@ int detect_markers(int no){ //This function extracts markers from blobs
                     d2=a2*a2+b2*b2;
                     d3=a3*a3+b3*b3;
                     avg=(2*2)*avg/(M_PI*M_PI);
+                    #ifdef VERBOSE_1
 		            printf("d1: %f, d2: %f, d3 %f, avg*thd: %f\n", d1,d2,d3,avg*thd);
+                    #endif
                     if((d1<avg*thd) &&(d2<avg*thd) &&(d3<avg*thd)){
                     	//evaluate hypothesis
                             cost=100000;
                             vx[0]=x1; vx[1]=x2; vx[2]=x3; vx[3]=x4;
                             vy[0]=_y1; vy[1]=y2; vy[2]=y3; vy[3]=y4;
+                            #ifdef VERBOSE_1
                          	printf("Evaluating hypothesis...\n");
+                            #endif
                             for(int j1=0;j1<4;j1++){
                                 for(int j2=0;j2<4;j2++){
                                     if(j2==j1) 
@@ -396,8 +423,10 @@ int detect_markers(int no){ //This function extracts markers from blobs
                                             feature_vectors.col(3) = feature_vectors.col(3)/feature_vectors.col(3).norm();
 
                                             //perform algorithm
+                                            #ifdef VERBOSE_1
                                             printf("computing p3p...\n");
                                             cout << "[" << j1 << " " << j2 << " " << j3 << " " << j4 << "]" << endl;
+                                            #endif
                                             for(int p3p_index = 0; p3p_index < 4; p3p_index++){
 
                                             feature_vectors_l.col(0) = feature_vectors.col( (0 + p3p_index)%4 );
@@ -459,19 +488,21 @@ int detect_markers(int no){ //This function extracts markers from blobs
 
                                                 //select only solutions that have small projection errors for all the beacons
                                                 if(lcost_max < cost){
-
+                                                    #ifdef VERBOSE_1
                                                     cout << "Here1" << endl;
+                                                    #endif
 
                                                     if( (zcam.dot(Rl.col(2))<-0.0) ){
                                                     //if( (zcam.dot(Rl.col(2))<-0.0)  && (xcam.dot(Rl.col(2))<-0.3) ){
                                                     //if( ( (zcam.dot(Rl.col(2))<-0.0) && (zcam.dot(Rl.col(2))>-0.9))  && (xcam.dot(Rl.col(2))<0) ){
-                                                    
+                                                        #ifdef VERBOSE_1
                                                         cout << "Here2" << endl;
                                                         cout << camR * Tl << endl;
                                                         cout << "[" << j1 << " " << j2 << " " << j3 << " " << j4 << "] -> " << l << endl;
                                                         cout << markerh3DProjected << endl << "and " << endl << markerh2DPredicted << endl << "and" << endl << markerh2D << endl;
                                                         cout << "cost = " << lcost_max << endl;
-                                                		cost=lcost_max;
+                                                		#endif
+                                                        cost=lcost_max;
 														Tsol=Tl;
 														aux1=vx[j1]; aux2=vx[j2]; aux3=vx[j3]; aux4=vx[j4];
 														aux1y=vy[j1]; aux2y=vy[j2]; aux3y=vy[j3]; aux4y=vy[j4];
@@ -486,7 +517,9 @@ int detect_markers(int no){ //This function extracts markers from blobs
                     		}
 				double cost_debug = (0.5*(fx+fy)/Tsol(2,3))*COST_CNST;
 	
+                #ifdef VERBOSE_1
 				printf("COST: %f, COST TO BE SURPASSED: %f, RATIO: %f, OBJCNT: %d\n", cost, cost_debug, cost/cost_debug, objcnt);
+                #endif
                     		if((cost <= (0.5*(fx+fy)/Tsol(2,3))*COST_CNST) && (objcnt<MAX_MARKERS)){ //validating cost (the error is a function of (f/<distance to object>) ) check if we have already too many markers, discard this marker
                                 #ifdef VERBOSE
                                     printf("The cost is lower than required\n");
@@ -496,7 +529,10 @@ int detect_markers(int no){ //This function extracts markers from blobs
      	               			//Update the object count that will be on the list
      	               			objcnt++;
      	               			//obtain the center of the object in the image, according to the distortion parameters
-			                    trans1 = Tsol.col(3);
+                                double avg[3];
+                                localization_beacon_geometric_center(objQuad, avg, 4);
+			                    //trans1 = Tsol.col(3);
+                                trans1=Tsol.col(0)*avg[0]+Tsol.col(1)*avg[1]+Tsol.col(2)*avg[2]+Tsol.col(3);
 			    				prx = trans1(0)*(fx/trans1(2));
 			    				pry = trans1(1)*(fy/trans1(2));
 			    				//inclination of the camera plane
@@ -556,7 +592,9 @@ int detect_markers(int no){ //This function extracts markers from blobs
 								//convert from the standard camera frame (x - right, y - down, z - front) to the used camera frame (x - front, y - left, z - front)
 								Tsol = camR * Tsol;
 								Tsol.col(3) = Tsol.col(3) + camt;
+                                #ifdef VERBOSE_1
                                 printf("%i\n", objcnt-1);
+                                #endif
 								Tsols[objcnt-1] = Tsol;
                                 
                                 #ifdef VERBOSE
@@ -678,26 +716,51 @@ int track_markers(unsigned char* buf,unsigned int step, int width, int height){
     }
 
     //Search for red blobs
+    cout << "-------------" << endl;
     for(vector<marker>::iterator it = marker_list.begin() ; it != marker_list.end(); ++it){
         localization=0;
         detect_blobs(buf,step,red_blob_sl,red_blob_sh,red_blob_hl,red_blob_hh,red_blob_vl,red_blob_vh,it->imx0_LED,it->imxf_LED,it->imy0_LED,it->imyf_LED, width, height, RED,0);
         int old_state=it->state;
         it->state=0;
+        int size_local = 0;
+        //count the amount of pixels of the red blob
         for(int l=0;l<no;l++)
+            if(blobs[l].valid==1)
+                size_local += blobs[l].size;
+        //expected radius of observed red marker
+        double pmin=((0.5*(fx+fy)/it->T(0,3))*0.02) * ((0.5*(fx+fy)/it->T(0,3))*0.02)*M_PI; //expected pixel count (we want a percentage of this ammount)
+        if((double)size_local>pmin*RED_BLOB_THRESHOLD_SCALE_FACTOR) //previous threshold was 15 - it was working fine for frame0
+            it->state=1;
+        //#ifdef VERBOSE_1
+        cout << "SIZEEE: " << size_local << ", MIN: " << pmin*RED_BLOB_THRESHOLD_SCALE_FACTOR << ", RANGE: " << it->T(0,3) << endl; 
+        //#endif
+        //hystireses
+        if(old_state == 1)
+            if(size_local >= 0.4*it->old_size_local)
+                it->state = 1;
+        it->old_size_local = size_local;
+
+        /*for(int l=0;l<no;l++)
             if(blobs[l].valid==1){
                 //expected radius of observed red marker
                 double pmin=((0.5*(fx+fy)/it->T(0,3))*0.02) * ((0.5*(fx+fy)/it->T(0,3))*0.02)*M_PI; //expected pixel count (we want a percentage of this ammount)
+                cout << "SIZEEE: " << blobs[l].size << ", MIN: " << pmin*RED_BLOB_THRESHOLD_SCALE_FACTOR << ", RANGE: " << it->T(0,3) << endl; 
                 if((double)blobs[l].size>pmin*RED_BLOB_THRESHOLD_SCALE_FACTOR){ //previous threshold was 15 - it was working fine for frame0
                     it->state=1;
                     break;
                 }
             }
+            */
         if(old_state!=it->state){
             double t_now = ros::Time::now().toSec();
             double dt = t_now - it->t_old; // time since last transition
             iter_count++;
             it->t_old = t_now; // update start time of new transition
             it->count = round(dt/dt_min-1); // find index that corresponds to detected frequency
+            cout << "DT = " << dt << endl;
+            #ifdef VERBOSE_1
+            cout << "COUNT: " << it->count << endl;
+            #endif
             if((it->count < 10) && (it->count >= 0)){ // ensure that frequency is valid
                 it->frequencies[it->count]++; // increment element corresponding to detected frequency
                 if(it->frequencies[it->count]>it->max)
@@ -715,27 +778,37 @@ int track_markers(unsigned char* buf,unsigned int step, int width, int height){
                 #endif
             }    
         }
-
-        /*cout << "FREQUENCIES: [";
+    
+        //#ifdef VERBOSE_1
+        cout << "FREQUENCIES: [";
         for(int l=0;l<10;l++)
             cout <<  it->frequencies[l] << " ";
-        cout << "]" << endl;*/
-
+        cout << "]" << endl;
+        //#endif
+    
         if(it->max>MARKER_THRESHOLD){ //THRESHOLD           
             //get frequency 
             freq=0,total=0;
+            #ifdef VERBOSE_1
             cout << "Frequencies: ";
+            #endif
             for(int l=0;l<10;l++){
+                #ifdef VERBOSE_1
                 cout << it->frequencies[l] << " ";
+                #endif
                 if(it->frequencies[l]>4){
                     freq+=(double)it->frequencies[l]*l;
                     total+=(double)it->frequencies[l];
                 }
             }
+            #ifdef VERBOSE_1
             cout << endl;
+            #endif
             if(total != 0)
                 freq/=(double)total;
+            #ifdef VERBOSE_1
             cout<< "FREQ = " << freq << endl;
+            #endif
         
             //get the quadrotor name from the computed frequency
             if(round(freq)>3 || round(freq)<0){
@@ -745,9 +818,12 @@ int track_markers(unsigned char* buf,unsigned int step, int width, int height){
             }
             else{
                 it->name = quad_freq_name[(int)round(freq)].c_str(); //this was not allocated!
+                #ifdef VERBOSE_1
                 cout << "quad id = " << it->name << endl;
+                #endif
             }
         }
     }
+    
     return nmarkers;
 }

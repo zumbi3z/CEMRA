@@ -30,6 +30,9 @@ void estimatorReset(estimator* est, VectorXd x, double t_current);
 //Kalman predict
 void estimatorPredict(estimator* est, string actuation_type, VectorXd u, MatrixXd& Q, double t_current);
 
+//Kalman random walk
+void estimatorRandomWalk(estimator* est, string actuation_type, VectorXd u, double t_current);
+
 //Kalman update
 void estimatorUpdate(estimator* est, string measurement_type, VectorXd m, MatrixXd& R);
 

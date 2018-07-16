@@ -1,6 +1,6 @@
-bvl: 80
-bvh: 120
-bhl: 230
+bvl: 70
+bvh: 255
+bhl: 220
 bhh: 240
-bsl: 80
-bsh: 120
+bsl: 70
+bsh: 255

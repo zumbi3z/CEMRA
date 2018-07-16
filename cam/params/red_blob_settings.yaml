@@ -1,6 +1,6 @@
 rvl: 0
-rvh: 100
+rvh: 255
 rhl: 330
 rhh: 360
-rsl: 50
-rsh: 100
+rsl: 15
+rsh: 255

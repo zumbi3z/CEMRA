@@ -10,7 +10,7 @@
 		<rosparam command="load" file="$(find cam)/params/blue_blob_settings_sim.yaml" />
 		<rosparam command="load" file="$(find cam)/params/red_blob_settings_sim.yaml" />
 	</node>
-<!--
+
 	<group ns="robot1">
 
 		<node pkg="estimator_cam" type="node" name="estimator" output="screen">
@@ -31,6 +31,5 @@
 		</node>
 
 	</group>
--->
 	
 </launch>

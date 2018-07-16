@@ -1,0 +1,16 @@
+<package>
+  <description brief="matlab_simulation">
+
+     matlab_simulation
+
+  </description>
+  <author>Duarte Dias</author>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/cam</url>
+  <depend package="image_transport"/>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="geometry_msgs"/>
+  
+</package>

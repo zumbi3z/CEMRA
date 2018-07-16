@@ -20,6 +20,7 @@ typedef struct t_marker{ //tracked marker structure
     int current_freq;
     int failures;
     double t_old;
+    double old_size_local;
 }marker;
 
 std::vector<marker>* get_markers();

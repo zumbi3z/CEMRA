@@ -37,6 +37,7 @@ using namespace Eigen;
 #define RATE 50
 #define LASER_COMPARISON 1
 #define PI 3.14159265
+#define VERBOSE
 
 vector<marker>* detected_quads; //Remember, marker struct = one quad
 MatrixXd* objects;
@@ -79,29 +80,24 @@ void image_reception_callback(const sensor_msgs::ImageConstPtr& msg){
     fillImage(rgb_img,"rgb8",img.height,img.width,img.step,buf);
     rgb_image_pub.publish(rgb_img);
 	*/
-    for(unsigned int l=0;l<img.height;l++)
-        for(unsigned int k=0;k<img.width;k++)
-        	if(bufb[l*img.width + k] > 0) 
-                bufb[l*img.width + k] = 255;
-    sensor_msgs::Image bin_img = *msg;
-    bufb = get_binary_image();
-    detected_quads = get_markers();
-    fillImage(bin_img,"mono8",img.height,img.width,img.step/3,bufb);
-    bin_image_pub.publish(bin_img);
 
 	//detect robots
     track_markers(buf, 3, img.width, img.height);	
 	detected_quads = get_markers();
 
 	//for each detected robot
+	#ifdef VERBOSE
 	cout << "Detected robots:" << endl;
+	#endif
 	for(vector<marker>::iterator it = detected_quads->begin(); it != detected_quads->end(); ++it){
 
 		//check if there were any errors in the detection of the robot
 		if(it->failures == 0){
 
 			//fill positioning structure that is going to be sent to ROS
+			#ifdef VERBOSE
 			cout << it->name << endl;
+			#endif
 			geometry_msgs::PoseWithCovarianceStamped robot_pose;
 			robot_pose.header.stamp = ros::Time::now();
 			robot_pose.header.frame_id = it->name;
@@ -126,9 +122,41 @@ void image_reception_callback(const sensor_msgs::ImageConstPtr& msg){
 			else if(!strcmp(robot_pose.header.frame_id.c_str(), "robot4")) cam_eval[3].publish(robot_pose);
 			else if(!strcmp(robot_pose.header.frame_id.c_str(), "unknown")) cam_eval[4].publish(robot_pose);
 
+			/*if( (robot_pose.pose.pose.position.x < 2.50) || (robot_pose.pose.pose.position.y < 1.1) )
+				cam_eval[1].publish(robot_pose);*/
+
 		}
 
 	}
+
+	for(unsigned int l=0;l<img.height;l++)
+        for(unsigned int k=0;k<img.width;k++)
+        	if(bufb[l*img.width + k] > 0)
+                bufb[l*img.width + k] = 255;
+    for(vector<marker>::iterator it = detected_quads->begin(); it != detected_quads->end(); ++it){
+		for(int k=it->imx0,l=it->imy0;k<it->imxf;k++) bufb[l*img.width  + k]=255;
+		for(int k=it->imx0,l=it->imyf;k<it->imxf;k++) bufb[l*img.width + k]=255;
+		for(int k=it->imx0,l=it->imy0;l<it->imyf;l++) bufb[l*img.width  + k]=255;
+		for(int k=it->imxf,l=it->imy0;l<it->imyf;l++) bufb[l*img.width + k]=255;
+
+		//if(strcmp(it->name,"unknown")){
+		    for(int l=it->imy0_LED;l<it->imyf_LED;l++)
+			for(int k=it->imx0_LED;k<it->imxf_LED;k++)
+			    if(bufb[l*img.width+ k]!=0)
+				bufb[l*img.width + k]=255;
+
+		    for(int k=it->imx0_LED,l=it->imy0_LED;k<it->imxf_LED;k++) bufb[l*img.width + k]=255;
+		    for(int k=it->imx0_LED,l=it->imyf_LED;k<it->imxf_LED;k++) bufb[l*img.width + k]=255;
+		    for(int k=it->imx0_LED,l=it->imy0_LED;l<it->imyf_LED;l++) bufb[l*img.width + k]=255;
+		    for(int k=it->imxf_LED,l=it->imy0_LED;l<it->imyf_LED;l++) bufb[l*img.width + k]=255;
+		    
+		//}
+	}
+    sensor_msgs::Image bin_img = *msg;
+    bufb = get_binary_image();
+    detected_quads = get_markers();
+    fillImage(bin_img,"mono8",img.height,img.width,img.step/3,bufb);
+    bin_image_pub.publish(bin_img);
 	
     return;
 }

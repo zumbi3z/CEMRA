@@ -1,0 +1,10 @@
+Number of robots in simulation: 3
+bag folder name: /home/duartecdias/Repos/CEMRA/bags/simulation/trajectory
+bag name: 2018-05-27-23-32-53_
+counter max: 1
+File '/home/duartecdias/Repos/CEMRA/bags/simulation/trajectory/2018-05-27-23-32-53_robot1_cam.txt' NOT opened.
+File '/home/duartecdias/Repos/CEMRA/bags/simulation/trajectory/2018-05-27-23-32-53_robot1_arena.txt' NOT opened.
+File '/home/duartecdias/Repos/CEMRA/bags/simulation/trajectory/2018-05-27-23-32-53_robot2_cam.txt' NOT opened.
+File '/home/duartecdias/Repos/CEMRA/bags/simulation/trajectory/2018-05-27-23-32-53_robot2_arena.txt' NOT opened.
+File '/home/duartecdias/Repos/CEMRA/bags/simulation/trajectory/2018-05-27-23-32-53_robot3_cam.txt' NOT opened.
+File '/home/duartecdias/Repos/CEMRA/bags/simulation/trajectory/2018-05-27-23-32-53_robot3_arena.txt' NOT opened.

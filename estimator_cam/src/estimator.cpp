@@ -79,6 +79,35 @@ void estimatorPredict(estimator* est, string actuation_type, VectorXd u, MatrixX
 
 }
 
+//Kalman random walk
+void estimatorRandomWalk(estimator* est, string actuation_type, VectorXd u, double t_current){
+
+	//do nothing if estimator is not running
+	if(!est->running) return ;
+
+	//compute period of time between predictions
+	double dt =  t_current - est->t_last;
+	est->t_last = t_current;
+
+	//generate motion model
+	MatrixXd F;
+	MatrixXd W;
+	VectorXd f;
+	if(modelMotionModel(est->model_name, est->parameters, actuation_type, est->x, u, F, f, W, dt) == 0){
+		cout << "Actuation model '" << actuation_type << "' was not found. Aborting predit..." << endl;
+		return ;
+	}
+
+	//cout << "Predict:\n" << u << "\n" << F << "\n" << W << "\n" << dt << endl;
+	//cout << "Start:\n" << est->x << "\n" << est->P << endl;
+
+	//apply Kalman predict
+	MatrixXd Q = 0.1*MatrixXd::Identity(u.size(), u.size());
+	MatrixXd Q1 = 0.0025*MatrixXd::Identity(est->dim, est->dim);
+	est->P = F*est->P*F.transpose() + Q1 + W*Q*W.transpose();
+	//est->P += Q;
+}
+
 //Kalman update
 void estimatorUpdate(estimator* est, string measurement_type, VectorXd m, MatrixXd& R){
 

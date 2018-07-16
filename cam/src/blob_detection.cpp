@@ -18,7 +18,7 @@
 //Namespaces
 using namespace std;
 //Macros
-#define BLOB_INFO 1 //Comment or uncomment this to see blob info
+//#define BLOB_INFO 1 //Comment or uncomment this to see blob info
 //#define LIGHT_CALIBRATION 1 //Comment or uncomment this to use the light calibration
 //Constants
 //#define VERBOSE
@@ -279,7 +279,9 @@ inline void aggregate_blobs(){
 inline void blob_threshold(){
     for(int k=0;k<no;k++){ //threshold on the blob sizes
         blobs[k].valid=(blobs[k].size<SIZE_THRESHOLD?0:blobs[k].valid);
+        #ifdef BLOB_INFO
         cout << "BLOB " << k << ": " << blobs[k].size << endl;
+        #endif
         //apply_noise(k);
     }
 }
@@ -332,7 +334,9 @@ int detect_blobs(unsigned char* buf, unsigned int step, int vl, int vh, int hl, 
     aggregate_blobs(); //aggregate blobs - (TODO use concept of covariance for thdp) 
     blob_threshold(); //Blob size threshold
 
-    cout << "NO: " << no << endl; 
+    #ifdef BLOB_INFO
+    cout << "NO: " << no << endl;
+    #endif
 
     
 

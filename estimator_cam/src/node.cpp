@@ -28,6 +28,7 @@ using namespace Eigen;
 typedef struct t_nparams{
 	void* actuation_params;
 	void* measurement_params;
+	double predict_time;
 } nparams;
 
 nparams node_params;
@@ -65,9 +66,12 @@ int readConfigurationParams(std::string param_name){
 	if( (node_params.actuation_params = modelConfigure(file_name + "../params/actuation_params.txt")) == (void*)NULL)
 		{cout << "Problem initializing actuation model." << endl; return 0;}
 
-	if( (node_params.measurement_params = modelConfigure(file_name + "../params/measurement_params.txt")) == (void*)NULL){
+	if( (node_params.measurement_params = modelConfigure(file_name + "../params/measurement_params_sim.txt")) == (void*)NULL){
 		{cout << "Problem initializing measurement model." << endl; return 0;}
 	}
+
+	//initialize node time counters
+	node_params.predict_time = 0.0;
 
 	//initialize estimator
 	est = estimatorInit("robot", "differential_drive", NULL);
@@ -82,6 +86,9 @@ int readConfigurationParams(std::string param_name){
 //prediction callback
 void prediction_callback(const geometry_msgs::TwistPtr& msg){
 
+	//update predict timer
+	node_params.predict_time = ros::Time::now().toSec();
+
 	//extract actuation from message
 	VectorXd u(2, 1);
 	u(0) = msg->linear.x;
@@ -94,8 +101,10 @@ void prediction_callback(const geometry_msgs::TwistPtr& msg){
 		return ;
 	}
 
+	/*
 	cout << "Prediction callback:\n" << u << "\n" << Q << endl;
 	cout << "Is estimator running: " << est->running << endl;
+	*/
 
 	//Kalman predict
 	if(est->running)
@@ -165,6 +174,12 @@ int main(int argc, char** argv){
 
     	//sleep acording to loop rate
         loop_rate.sleep();
+
+        //random walk if necessary
+        if( (ros::Time::now().toSec() - node_params.predict_time) >= 0.5){
+        	VectorXd u(2, 1); u << 1.0, 0.0;
+			estimatorRandomWalk(est, "differential_drive", u, ros::Time::now().toSec());
+        }
 
         //age estimator (it will stop running after a while)
         estimatorIncrement(est);
