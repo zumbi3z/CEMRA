@@ -58,6 +58,13 @@ static ros::Publisher cam_eval[10];
 
 geometry_msgs::PoseStamped msg;
 
+//color for the bounding boxes
+double colormap[] = {0.2422, 0.1504, 0.6603,
+                     0.0067, 0.7312, 0.7660,
+                     0.3909, 0.8029, 0.4354,
+                     0.9035, 0.7330, 0.1774,
+                     0.9597, 0.9135, 0.1423};
+
 void image_reception_callback(const sensor_msgs::ImageConstPtr& msg){
 
 	//get image
@@ -156,10 +163,29 @@ void image_reception_callback(const sensor_msgs::ImageConstPtr& msg){
 
     //publishing rgb image
     for(vector<marker>::iterator it = detected_quads->begin(); it != detected_quads->end(); ++it){
-		for(int k=it->imx0,l=it->imy0;k<it->imxf;k++) buf[3*(l*img.width + k) + 2]=255;
-		for(int k=it->imx0,l=it->imyf;k<it->imxf;k++) buf[3*(l*img.width + k) + 2]=255;
-		for(int k=it->imx0,l=it->imy0;l<it->imyf;l++) buf[3*(l*img.width + k) + 2]=255;
-		for(int k=it->imxf,l=it->imy0;l<it->imyf;l++) buf[3*(l*img.width + k) + 2]=255;
+
+    	//attribute color according to robot name
+    	double r, g, b;
+    	std::string robot_name = it->name;
+    	robot_name[strlen("robot")] = '\0'; //detect robot in the name
+    	if(strcmp(robot_name.c_str(), "robot") == 0){
+    		int n = atoi( &it->name[strlen("robot")] ) - 1;
+    		cout << "ROBOT number: " << n << endl;
+    		r = colormap[3*n + 0];
+    		g = colormap[3*n + 1];
+    		b = colormap[3*n + 2];
+    	}
+    	else {r = g = b = 0.7;}
+
+    	//write bounding boxes around detected robots
+		for(int k=it->imx0,l=it->imy0;k<it->imxf;k++)
+			{buf[3*(l*img.width + k) + 0] = 255*b; buf[3*(l*img.width + k) + 1] = 255*g; buf[3*(l*img.width + k) + 2] = 255*r;}
+		for(int k=it->imx0,l=it->imyf;k<it->imxf;k++)
+			{buf[3*(l*img.width + k) + 0] = 255*b; buf[3*(l*img.width + k) + 1] = 255*g; buf[3*(l*img.width + k) + 2] = 255*r;}
+		for(int k=it->imx0,l=it->imy0;l<it->imyf;l++)
+			{buf[3*(l*img.width + k) + 0] = 255*b; buf[3*(l*img.width + k) + 1] = 255*g; buf[3*(l*img.width + k) + 2] = 255*r;}
+		for(int k=it->imxf,l=it->imy0;l<it->imyf;l++)
+			{buf[3*(l*img.width + k) + 0] = 255*b; buf[3*(l*img.width + k) + 1] = 255*g; buf[3*(l*img.width + k) + 2] = 255*r;}
 	}
     sensor_msgs::Image rgb_img = *msg;
     fillImage(rgb_img,"bgr8",img.height,img.width,img.step,buf);

@@ -10,7 +10,7 @@ addpath(genpath(repo_path));
 setenv('LD_PRELOAD','/usr/lib/x86_64-linux-gnu/libstdc++.so.6:/usr/lib/x86_64-linux-gnu/libexpat.so');
 
 %name of bag to process
-bag_file = '2018-07-14-20-11-09.bag';
+bag_file = '2018-07-16-22-26-00.bag';
 simulation = 0;
 
 %process bags
@@ -72,7 +72,7 @@ repo_path = char(splitted_string{1});
 addpath(genpath(repo_path));
 
 %name of bag to process
-bag_file = '2018-07-14-20-11-0';
+bag_file = '2018-07-16-22-26-0';
 
 %process bags
 !roscore &
