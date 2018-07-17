@@ -27,11 +27,13 @@ estimator* estimatorInit(string name, string model_name, void* parameters){
 }
 
 //insert initial conditions into the estimator (the estimator will be marked as running)
-void estimatorReset(estimator* est, VectorXd x, double t_current){
+void estimatorReset(estimator* est, VectorXd x, VectorXd p, double t_current, int start_estimator){
 
 	//insert initial conditions
 	est->x = x;
 	est->P = MatrixXd::Identity(est->dim, est->dim);
+	for(int k = 0; k < est->dim; k++)
+		est->P(k, k) = p(k);
 
 	//initializing time
 	est->t_last = t_current;
@@ -40,7 +42,7 @@ void estimatorReset(estimator* est, VectorXd x, double t_current){
 	est->t = 0;
 
 	//run estimator
-	est->running = 1;
+	est->running = start_estimator;
 
 	//cout << "estimator:\n" << est->name << "\n" << est->model_name << "\n" << est->x << "\n" << est->P <<"\n" << est->dim << "\n" << est->t_last << endl;
 

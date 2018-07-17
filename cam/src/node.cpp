@@ -52,7 +52,7 @@ double last_value = 0.0;
 int width;
 int height;
 
-//static ros::Publisher rgb_image_pub;
+static ros::Publisher rgb_image_pub;
 static ros::Publisher bin_image_pub;
 static ros::Publisher cam_eval[10];
 
@@ -74,12 +74,6 @@ void image_reception_callback(const sensor_msgs::ImageConstPtr& msg){
             
         }
     }
-    /*
-    //publishing usefull information
-    sensor_msgs::Image rgb_img = *msg;
-    fillImage(rgb_img,"rgb8",img.height,img.width,img.step,buf);
-    rgb_image_pub.publish(rgb_img);
-	*/
 
 	//detect robots
     track_markers(buf, 3, img.width, img.height);	
@@ -129,6 +123,7 @@ void image_reception_callback(const sensor_msgs::ImageConstPtr& msg){
 
 	}
 
+	//publishing binary image
 	for(unsigned int l=0;l<img.height;l++)
         for(unsigned int k=0;k<img.width;k++)
         	if(bufb[l*img.width + k] > 0)
@@ -157,6 +152,19 @@ void image_reception_callback(const sensor_msgs::ImageConstPtr& msg){
     detected_quads = get_markers();
     fillImage(bin_img,"mono8",img.height,img.width,img.step/3,bufb);
     bin_image_pub.publish(bin_img);
+
+
+    //publishing rgb image
+    for(vector<marker>::iterator it = detected_quads->begin(); it != detected_quads->end(); ++it){
+		for(int k=it->imx0,l=it->imy0;k<it->imxf;k++) buf[3*(l*img.width + k) + 2]=255;
+		for(int k=it->imx0,l=it->imyf;k<it->imxf;k++) buf[3*(l*img.width + k) + 2]=255;
+		for(int k=it->imx0,l=it->imy0;l<it->imyf;l++) buf[3*(l*img.width + k) + 2]=255;
+		for(int k=it->imxf,l=it->imy0;l<it->imyf;l++) buf[3*(l*img.width + k) + 2]=255;
+	}
+    sensor_msgs::Image rgb_img = *msg;
+    fillImage(rgb_img,"bgr8",img.height,img.width,img.step,buf);
+    rgb_image_pub.publish(rgb_img);
+
 	
     return;
 }
@@ -197,7 +205,7 @@ int main(int argc, char** argv){
     ros::Subscriber image_sub=nh.subscribe("camera1/image_raw", 1, image_reception_callback); // only 1 in buffer size to drop other images if processing is not finished
 
     //publishers
-    //rgb_image_pub=nh.advertise<sensor_msgs::Image>("node/rgb_image",1);
+    rgb_image_pub=nh.advertise<sensor_msgs::Image>("node/rgb_image",1);
     bin_image_pub=nh.advertise<sensor_msgs::Image>("node/binary_image",1);
     cam_eval[0] = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/robot1/cam_pose",1);
     cam_eval[1] = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/robot2/cam_pose",1);

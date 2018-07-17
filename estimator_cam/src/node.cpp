@@ -76,7 +76,8 @@ int readConfigurationParams(std::string param_name){
 	//initialize estimator
 	est = estimatorInit("robot", "differential_drive", NULL);
 	VectorXd x(3,1); x << 0, 0, 0;
-	estimatorReset(est, x, ros::Time::now().toSec());
+	VectorXd p(3, 1); p << 1, 1, 0.1;
+	estimatorReset(est, x, p, ros::Time::now().toSec(), 0);
 
 	//return success
 	return 1;
@@ -142,8 +143,30 @@ void measurement_callback(const geometry_msgs::PoseWithCovarianceStampedPtr& msg
 	//Kalman update (select correct estimator)
 	if(est->running)
 		estimatorUpdate(est, "2d_position", x2D, R2D);
-	else
-		estimatorReset(est, x2D, ros::Time::now().toSec());
+	else { //initialize Kalman if estimator is not running
+
+		//get 2D positions
+		VectorXd x(3,1);
+		x(0) = x2D(0);
+		x(1) = x2D(1);
+
+		//get yaw
+		VectorXd q(4, 1);
+		q << msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w;
+		MatrixXd Rq(4, 4);
+		VectorXd yaw(1, 1);
+		MatrixXd Ryaw(1, 1);
+		if(modelConvertMeasurement("project_camera_pose", "camera_attitude", node_params.measurement_params, q, Rq, yaw, Ryaw) == 0){
+			cout << "cannot apply '" << "project_camera_pose" << "' to measurement type '" << "camera_attitude" << "'. Aborting. . ." << endl;
+			return ;
+		}
+		x(2) = yaw(0) + 0.78;
+		cout << "Yaw = " << x(2) << endl;
+
+		//initialize estimator
+		VectorXd p(3, 1); p << 1, 1, 0.02;
+		estimatorReset(est, x, p, ros::Time::now().toSec(), 1);
+	}
 
 }
 

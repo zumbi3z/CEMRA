@@ -25,7 +25,7 @@ typedef struct t_estimator{
 estimator* estimatorInit(string name, string model_name, void* parameters);
 
 //insert initial conditions into the estimator (the estimator will be marked as running)
-void estimatorReset(estimator* est, VectorXd x, double t_current);
+void estimatorReset(estimator* est, VectorXd x, VectorXd p, double t_current, int start_estimator);
 
 //Kalman predict
 void estimatorPredict(estimator* est, string actuation_type, VectorXd u, MatrixXd& Q, double t_current);

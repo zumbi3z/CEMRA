@@ -52,6 +52,7 @@ int modelDifferentialDrive(string model_name, void* parameters, VectorXd x, Vect
 	//decoding actuation into linear and angular speeds
 	double v = u(0);
 	double w = u(1);
+	w = w*0.74;
 
 	//model
 	f = VectorXd(3, 1);
@@ -233,7 +234,7 @@ int modelSetMeasurementNoise(string measurement_type, void* parameters, VectorXd
 //--------------------------------------------------------model convertions--------------------------------------------------------//
 //takes a vehicle pose measurement acquired by the camera and computes its projection in the ground plane
 //the uncertainty of the measurement is transformed accordingly
-void measurementProjection(camera_parameters* cam, VectorXd x3D, MatrixXd R3D, VectorXd& x2D, MatrixXd& R2D){
+void measurementProjection_pos(camera_parameters* cam, VectorXd x3D, MatrixXd R3D, VectorXd& x2D, MatrixXd& R2D){
 
 	//defining the projection matrix
 	MatrixXd Pr(2, 3);
@@ -248,12 +249,36 @@ void measurementProjection(camera_parameters* cam, VectorXd x3D, MatrixXd R3D, V
 
 }
 
+//takes a vehicle orientation measurement acquired by the camera and computes its projection in the ground plane
+//the uncertainty of the measurement is still not processed
+void measurementProjection_yaw(camera_parameters* cam, VectorXd x4D, MatrixXd R4D, VectorXd& x1D, MatrixXd& R1D){
+
+	//get rotation matrix
+	Quaterniond q;
+	q.x() = x4D(0);
+	q.y() = x4D(1);
+	q.z() = x4D(2);
+	q.w() = x4D(3);
+	MatrixXd Rmat = q.normalized().toRotationMatrix();
+
+	//transform rotation matrix out of the camera frame
+	Rmat = cam->R*Rmat;
+
+	//compute yaw measurement
+	x1D << atan2(Rmat(1,0), Rmat(0,0));
+
+}
+
 int modelConvertMeasurement(string transformation_type, string measurement_type, void* parameters, VectorXd m1, MatrixXd R1, VectorXd& m2, MatrixXd& R2){
 
 	//go through possible measurement transformations
 	if(strcmp(transformation_type.c_str(), "project_camera_pose") == 0){
 		if(strcmp(measurement_type.c_str(), "camera_pose") == 0){
-			measurementProjection( (camera_parameters*)parameters, m1, R1, m2, R2);
+			measurementProjection_pos( (camera_parameters*)parameters, m1, R1, m2, R2);
+			return 1;
+		}
+		else if(strcmp(measurement_type.c_str(), "camera_attitude") == 0){
+			measurementProjection_yaw( (camera_parameters*)parameters, m1, R1, m2, R2);
 			return 1;
 		}
 		else return 0;
